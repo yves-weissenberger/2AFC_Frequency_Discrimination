@@ -14,6 +14,26 @@ from pygame.locals import *
 
 print "Im online :)"
 
+#
+# This is code that presents clicks and then 
+#
+#
+#
+#
+# Includes Error Correction Trials
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+
+
+
 
 
 #-----------------------------------------------------------------
@@ -91,7 +111,11 @@ def rew_action(side,rewProcR,rewProcL):
 # Task parameters
 
 # Stimulus frequencies
-centrFreq = 12 * 10**3 #in Hz
+#frequencies spaced one and half octaves apart
+lowF = 8000
+highF = np.logspace(np.log10(8000),np.log10(32000),num=25)[18]
+centreFreq = np.logspace(lowF,highF,num=3)[1]
+freqs = [highF,lowF]
 
 # Stimulus timing
 dur = 0.2 # duration of a sound, in seconds
@@ -99,7 +123,6 @@ waitS = 4
 waitL = 8
 # Experiment structure 
 ExpDur = 120000 #max total duration in seconds
-NumT = ExpDur / waitL
 
 # Reward stuff
 rewTotMax = 300 #total number of rewards allowed in one experimental block, before it is aborted
@@ -167,7 +190,28 @@ snd_Tpl = snd_Tpl_All[initIdx]
 
 def play_sound(sound):
     sound.play()
-   
+
+
+
+def data_sender(lickList,rewList,sndList,sendT)
+
+    sndStr = 'sndList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in sndList])
+    lickStr = 'LickList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in lickList])
+    rewStr = 'rewList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in rewList])
+    sendStr = ','.join([rewStr,sndStr,lickStr])
+            
+    sendProc = billiard.Process(target=send_data,args=(sendStr,))
+    sendProc.start()
+    print 'seeeeeending', (time.time()-start-soundT)
+    #send_data(sendStr)
+    sendT = time.time()
+    sndList = []; lickList = []; rewList = [];
+    return sndList, lickList, rewList, sendT
+
+
+
+
+
 #_____________________________________________________________________________
 # START of the Experiment
 
@@ -182,8 +226,8 @@ rewTot = 0
 start = time.time() #THIS IS THE T=0 POINT
 
 lickLst = []
-rewLst = []
-sndL = []
+rewList = []
+sndList = []
 rewList = []
 sendT = time.time()
 lickT = time.time()
@@ -201,14 +245,16 @@ sndLat = 0.8  #time between the click and the target stimulus
 get_ITI = lambda mu: np.abs(np.random.normal(loc=0,scale=1) + mu)
 ITI = get_ITI(waitS)
 isPlaying = True
+
+
 while time.time() - start < ExpDur and rewTot <= rewTotMax:
 
 	#if 5 seconds have elapsed since the last data_send
 	if (time.time()-sendT>5):
 
-		sndStr = 'sndList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in sndL])
+		sndStr = 'sndList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in sndList])
 		lickStr = 'LickList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in lickList])
-		rewStr = 'rewList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in rewLst])
+		rewStr = 'rewList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in rewList])
 		sendStr = ','.join([rewStr,sndStr,lickStr])
 			    
 		sendProc = billiard.Process(target=send_data,args=(sendStr,))
@@ -216,7 +262,7 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 		print 'seeeeeending', (time.time()-start-soundT)
 		#send_data(sendStr)
 		sendT = time.time()
-		sndL = []; lickList = []; rewLst = [];
+		sndList = []; lickList = []; rewList = [];
 
 
         
@@ -224,80 +270,83 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 		print 'sound'
 		#Play target sound
 		if firstLick == False:
-                    pass#LR_target = np.random.randint(0,2)
+            pass#LR_target = np.random.randint(0,2)
 		clickT = time.time() - start
 		stim, sndNr, deltaV = get_stim(snd_list,LR_target)
 		soundId = freqs[LR_target]
 		#play_sound(click) #play the sound
-		sndL.append([time.time()-start,'_'+'click'])
+		sndList.append([time.time()-start,'_'+'click'])
 		isPlaying = False
 
 
         if ((time.time() - start - clickT)>sndLat and isPlaying==False):
             soundT = time.time() - start
             play_sound(snd_Tpl_All[LR_target])
-	    firstLick = False
-            sndL.append([time.time()-start,'_'+str(LR_target)])
+            firstLick = False
+            sndList.append([time.time()-start,'_'+str(LR_target)])
             isPlaying = True
 
 	
-        #0 is right, 1 is left
+#Lick detection part of the code _______________________________________________________________________________________________
+#For reward mapping, 0 is right, 1 is left
 	if (GPIO.event_detected(lickL)):
             
 	    if (time.time()-prevL)>minILI:
-		lickT = time.time()
-		lickList.append([lickT - start,'L'])
-                
-                
-                if ((time.time()-start-soundT)<1 and firstLick==False):
-                    if LR_target==1:
-                        free = False
-                        rewT = time.time() - start
-                        rewLst.append([rewT,'_'+str(['R' if LR_target==0 else 'L'][0])])
-                        LR_target = rew_action(LR_target,rewProcR,rewProcL)
-                        noRew = 0
-			ITI = get_ITI(waitS)
+    		lickT = time.time()
+    		lickList.append([lickT - start,'L'])
+                    
+                    # if the lick occurred up to 1 second after the onset of the sound
+                    if ((time.time()-start-soundT)<1 and firstLick==False):
+                        
+                        if LR_target==1: #and was on the correct side
+                            free = False
+                            rewT = time.time() - start
+                            rewList.append([rewT,'_'+str(['R' if LR_target==0 else 'L'][0])])
+                            LR_target = rew_action(LR_target,rewProcR,rewProcL)
+                            noRew = 0
+    			            ITI = get_ITI(waitS)
 
-                    else:
-                        if firstLick==False:
-                            #LR_target = np.random.randint(0,2)
-                            noRew += 1
-                            rewLst.append([rewT,'_'+str(['noR' if LR_target==0 else 'noL'][0])])
-                            ITI = get_ITI(waitL)
+                        else: #if it was on the wrong side
+                            if firstLick==False:  #if this is not on the wrong side
+                                #LR_target = np.random.randint(0,2) #unhash this to remove error correction Trials
+                                noRew += 1
+                                rewList.append([rewT,'_'+str(['noR' if LR_target==0 else 'noL'][0])])
+                                ITI = get_ITI(waitL)
 
-                                        
-		prevL = time.time()
-		firstLick = True
+                                            
+    		prevL = time.time()
+            firstLick = True
 	    else:
-		prevL = time.time()
+            prevL = time.time()
+
 
 	if (GPIO.event_detected(lickR) ):
 
 	    if (time.time()-prevL)>minILI:
-		lickT = time.time()
-		lickList.append([lickT - start,'R'])
+    		lickT = time.time()
+    		lickList.append([lickT - start,'R'])
 
 
-                if ((time.time()-start-soundT)<1 and firstLick==False):
-                    if LR_target==0:
-                        free = False
-                        rewT = time.time() - start
-                        rewLst.append([rewT,'_'+str(['R' if LR_target==0 else 'L'][0])])
-                        LR_target = rew_action(LR_target,rewProcR,rewProcL)
-                        noRew = 0
-			ITI = get_ITI(waitS)
+                    if ((time.time()-start-soundT)<1 and firstLick==False):
+                        if LR_target==0:
+                            free = False
+                            rewT = time.time() - start
+                            rewList.append([rewT,'_'+str(['R' if LR_target==0 else 'L'][0])])
+                            LR_target = rew_action(LR_target,rewProcR,rewProcL)
+                            noRew = 0
+                            ITI = get_ITI(waitS)
 
-                    else:
-                       if firstLick==False:
-                            #LR_target = np.random.randint(0,2)
-                            noRew += 1
-                            rewLst.append([rewT,'_'+str(['noR' if LR_target==0 else 'noL'][0])])
-                            ITI = get_ITI(waitL)
-                            
+                        else:
+                           if firstLick==False:
+                                #LR_target = np.random.randint(0,2)
+                                noRew += 1
+                                rewList.append([rewT,'_'+str(['noR' if LR_target==0 else 'noL'][0])])
+                                ITI = get_ITI(waitL)
+                                
 
-		prevL = time.time()
-		firstLick = True
+    		prevL = time.time()
+    		firstLick = True
 	    else:
-		prevL = time.time()
+            prevL = time.time()
                 
 

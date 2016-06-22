@@ -219,20 +219,20 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 	if (GPIO.event_detected(lickL)):
 
 	    if (time.time()-prevL)>minILI:
-		lickT = time.time()
-		lickList.append([lickT - start,'L'])
+			lickT = time.time()
+			lickList.append([lickT - start,'L'])
 
-		prevL = time.time()
+			prevL = time.time()
 	    else:
-		prevL = time.time()
+			prevL = time.time()
 
 	if (GPIO.event_detected(lickR) ):
 
 	    if (time.time()-prevL)>minILI:
-		lickT = time.time()
-		lickList.append([lickT - start,'R'])
-		prevL = time.time()
+			lickT = time.time()
+			lickList.append([lickT - start,'R'])
+			prevL = time.time()
 	    else:
-		prevL = time.time()
+			prevL = time.time()
                 
 

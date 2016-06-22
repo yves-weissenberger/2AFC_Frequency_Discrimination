@@ -100,7 +100,6 @@ waittime = 8 #waiting time from moment both spouts have been licked, to presenta
 
 # Experiment structure 
 ExpDur = 120000 #max total duration in seconds
-NumT = ExpDur / ISI
 
 # Reward stuff
 rewTotMax = 300 #total number of rewards allowed in one experimental block, before it is aborted
@@ -234,15 +233,16 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 
                 if rewList == []:
                     rewLst.append([rewT,'_'+str(['freeR' if LR_target==0 else 'freeL'][0])])
-		    waittime = 16
-                LR_target = rew_action(LR_target,rewProcR,rewProcL)
-                firstLick = True
-                free = False
+		              waittime = 16
+                    LR_target = rew_action(LR_target,rewProcR,rewProcL)
+                    firstLick = True
+                    free = False
                 
 
 
 
-        #0 is right, 1 is left
+#Lick detection part of the code _______________________________________________________________________________________________
+#For reward mapping, 0 is right, 1 is left
 	if (GPIO.event_detected(lickL)):
             
 	    if (time.time()-prevL)>minILI:
