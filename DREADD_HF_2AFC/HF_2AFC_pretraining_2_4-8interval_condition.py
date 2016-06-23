@@ -78,11 +78,11 @@ def rew_action(side,rewProcR,rewProcL):
     if side==0:
         #time.sleep(0.1)
         rewProcR = billiard.Process(target=deliverRew,args=(rewR,))
-        rewProcR.start()
+        rewProcR.run()
     if side==1:
         #time.sleep(0.1)
         rewProcL = billiard.Process(target=deliverRew,args=(rewL,))
-        rewProcL.start()
+        rewProcL.run()
     LR_target = rnd.randint(2)
     return LR_target
 
@@ -153,7 +153,26 @@ snd_Tpl = snd_Tpl_All[initIdx]
 
 def play_sound(sound):
     sound.play()
-   
+
+
+#_____________________________________________________________________________
+
+def data_sender(lickList,rewList,sndList,sendT):
+
+    sndStr = 'sndList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in sndList])
+    lickStr = 'LickList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in lickList])
+    rewStr = 'rewList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in rewList])
+    sendStr = ','.join([rewStr,sndStr,lickStr])
+            
+    sendProc = billiard.Process(target=send_data,args=(sendStr,))
+    sendProc.start()
+    print 'seeeeeending', (time.time()-start-soundT)
+    #send_data(sendStr)
+    sendT = time.time()
+    sndList = []; lickList = []; rewList = [];
+    return lickList, rewList,sndList, sendT
+
+
 #_____________________________________________________________________________
 # START of the Experiment
 
@@ -169,7 +188,7 @@ start = time.time() #THIS IS THE T=0 POINT
 
 lickLst = []
 rewLst = []
-sndL = []
+sndList = []
 rewList = []
 sendT = time.time()
 lickT = time.time()
@@ -187,7 +206,7 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 	#if 5 seconds have elapsed since the last data_send
 	if (time.time()-sendT>5):
 
-		sndStr = 'sndList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in sndL])
+		sndStr = 'sndList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in sndList])
 		lickStr = 'LickList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in lickList])
 		rewStr = 'rewList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in rewLst])
 		sendStr = ','.join([rewStr,sndStr,lickStr])
@@ -197,7 +216,7 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 		print 'seeeeeending', (time.time()-start-soundT)
 		#send_data(sendStr)
 		sendT = time.time()
-		sndL = []; lickList = []; rewLst = [];
+		sndList = []; lickList = []; rewLst = [];
 
 
     
@@ -205,13 +224,14 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 		print 'sound'
 		#Play target sound
 		soundT = time.time() - start
-		soundId = freqs[LR_target]
 		if firstLick == False:
                     noRew +=1
                 else:
                     pass
-		play_sound(snd_Tpl_All[LR_target]) #play the sound
-		sndL.append([time.time()-start,'_'+str(LR_target)])
+		snd, vol, freq = get_sound(LR_target)
+        play_sound(snd) #play the sound
+        sndList.append([time.time()-start,'_'+'S:'+str(LR_target)+'F:'+str(freq)+'V:'+str(vol)])
+
 
 
                 if noRew>= 0:
@@ -246,8 +266,8 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 	if (GPIO.event_detected(lickL)):
             
 	    if (time.time()-prevL)>minILI:
-		lickT = time.time()
-		lickList.append([lickT - start,'L'])
+    		lickT = time.time()
+    		lickList.append([lickT - start,'L'])
                 
                 
                 if ((time.time()-start-soundT)<1 and firstLick==False):
@@ -257,24 +277,25 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
                         rewLst.append([rewT,'_'+str(['R' if LR_target==0 else 'L'][0])])
                         LR_target = rew_action(LR_target,rewProcR,rewProcL)
                         noRew = 0
-			waittime = 4
+			            waittime = shortT
                     else:
                         if firstLick==False:
                             #LR_target = np.random.randint(0,2)
+                            waitTime = longT
                             noRew += 1
                             rewLst.append([rewT,'_'+str(['noR' if LR_target==0 else 'noL'][0])])
 
                 
-		prevL = time.time()
-		firstLick = True
+            prevL = time.time()
+            firstLick = True
 	    else:
-		prevL = time.time()
+            prevL = time.time()
 
 	if (GPIO.event_detected(lickR) ):
 
 	    if (time.time()-prevL)>minILI:
-		lickT = time.time()
-		lickList.append([lickT - start,'R'])
+    		lickT = time.time()
+    		lickList.append([lickT - start,'R'])
 
 
                 if ((time.time()-start-soundT)<1 and firstLick==False):
@@ -284,17 +305,18 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
                         rewLst.append([rewT,'_'+str(['R' if LR_target==0 else 'L'][0])])
                         LR_target = rew_action(LR_target,rewProcR,rewProcL)
                         noRew = 0
-			waittime = 4
+                        waittime = shortT
                     else:
                        if firstLick==False:
                             #LR_target = np.random.randint(0,2)
+                            waittime = longT
                             noRew += 1
                             rewLst.append([rewT,'_'+str(['noR' if LR_target==0 else 'noL'][0])])
 
 
-		prevL = time.time()
-		firstLick = True
+    		prevL = time.time()
+    		firstLick = True
 	    else:
-		prevL = time.time()
+            prevL = time.time()
                 
 

@@ -98,11 +98,11 @@ def rew_action(side,rewProcR,rewProcL):
     if side==0:
         #time.sleep(0.1)
         rewProcR = billiard.Process(target=deliverRew,args=(rewR,))
-        rewProcR.start()
+        rewProcR.run()
     if side==1:
         #time.sleep(0.1)
         rewProcL = billiard.Process(target=deliverRew,args=(rewL,))
-        rewProcL.start()
+        rewProcL.run()
     LR_target = rnd.randint(2)
     return LR_target
 
@@ -209,6 +209,13 @@ def data_sender(lickList,rewList,sndList,sendT)
     return sndList, lickList, rewList, sendT
 
 
+def get_sound(idx):
+    volume = np.random.randint(40,140)/100
+    freq = np.random.lognormal(mean=np.log(freqs[idx]),sigma=1/24,size=1)
+    sndArr = gensin(frequency=freq)
+    SOUND = sndArr * volume
+    snd = pygame.sndarray.make_sound(SOUND.astype('int16'))
+    return snd, volume, freq
 
 
 

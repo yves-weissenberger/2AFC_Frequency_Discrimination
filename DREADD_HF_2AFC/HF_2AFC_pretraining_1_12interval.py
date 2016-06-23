@@ -92,11 +92,11 @@ def rew_action(side,rewProcR,rewProcL):
     if side==0:
         #time.sleep(0.1)
         rewProcR = billiard.Process(target=deliverRew,args=(rewR,))
-        rewProcR.start()
+        rewProcR.run()
     if side==1:
         #time.sleep(0.1)
         rewProcL = billiard.Process(target=deliverRew,args=(rewL,))
-        rewProcL.start()
+        rewProcL.run()
     LR_target = rnd.randint(2)
     return LR_target
 
@@ -233,7 +233,6 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 
 	#if 5 seconds have elapsed since the last data_send
 	if (time.time()-sendT>5):
-
 		lickList, rewList,sndList, sendT = data_sender(lickList,rewList,sndList,sendT)
 
     

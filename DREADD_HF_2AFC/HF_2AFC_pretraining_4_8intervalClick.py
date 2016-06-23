@@ -143,14 +143,14 @@ def gensin(frequency=12000, duration=dur, sampRate=sR, edgeWin=0.01):
 
 
 
-def get_stim(sndArray,LR_target):
+def get_sound(idx):
+    volume = np.random.randint(40,140)/100
+    freq = np.random.lognormal(mean=np.log(freqs[idx]),sigma=1/24,size=1)
+    sndArr = gensin(frequency=freq)
+    SOUND = sndArr * volume
+    snd = pygame.sndarray.make_sound(SOUND.astype('int16'))
+    return snd, volume, freq
 
-   sndNr = rnd.randint( (LR_target*nStims/2),nStims/2+(LR_target*nStims/2))
-   deltaV = 1#rnd.uniform(0.8,1.2)
-   stim = pygame.sndarray.make_sound(
-				np.round(sndArray[sndNr]*deltaV).astype('int16'))
-
-   return stim, sndNr, deltaV
 
 
 #_____________________________________________________________________________

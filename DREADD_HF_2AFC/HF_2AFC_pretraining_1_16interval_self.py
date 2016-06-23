@@ -76,11 +76,11 @@ def rew_action(side,rewProcR,rewProcL):
     if side==0:
         #time.sleep(0.1)
         rewProcR = billiard.Process(target=deliverRew,args=(rewR,))
-        rewProcR.start()
+        rewProcR.run()
     if side==1:
         #time.sleep(0.1)
         rewProcL = billiard.Process(target=deliverRew,args=(rewL,))
-        rewProcL.start()
+        rewProcL.run()
     LR_target = rnd.randint(2)
     return LR_target
 
@@ -152,7 +152,25 @@ snd_Tpl = snd_Tpl_All[initIdx]
 
 def play_sound(sound):
     sound.play()
-   
+ 
+#_____________________________________________________________________________
+
+def data_sender(lickList,rewList,sndList,sendT):
+
+    sndStr = 'sndList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in sndList])
+    lickStr = 'LickList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in lickList])
+    rewStr = 'rewList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in rewList])
+    sendStr = ','.join([rewStr,sndStr,lickStr])
+            
+    sendProc = billiard.Process(target=send_data,args=(sendStr,))
+    sendProc.start()
+    print 'seeeeeending', (time.time()-start-soundT)
+    #send_data(sendStr)
+    sendT = time.time()
+    sndList = []; lickList = []; rewList = [];
+    return lickList, rewList,sndList, sendT
+
+
 #_____________________________________________________________________________
 # START of the Experiment
 
@@ -168,7 +186,7 @@ start = time.time() #THIS IS THE T=0 POINT
 
 lickLst = []
 rewLst = []
-sndL = []
+sndList = []
 
 sendT = time.time()
 lickT = time.time()
@@ -182,18 +200,9 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 
 	#if 5 seconds have elapsed since the last data_send
 	if (time.time()-sendT>5):
+		lickList, rewList,sndList, sendT = data_sender(lickList,rewList,sndList,sendT)
 
-		sndStr = 'sndList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in sndL])
-		lickStr = 'LickList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in lickList])
-		rewStr = 'rewList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in rewLst])
-		sendStr = ','.join([rewStr,sndStr,lickStr])
-			    
-		sendProc = billiard.Process(target=send_data,args=(sendStr,))
-		sendProc.start()
-		print 'seeeeeending', (time.time()-start-soundT)
-		#send_data(sendStr)
-		sendT = time.time()
-		sndL = []; lickList = []; rewLst = [];
+
 
 
     
@@ -201,9 +210,10 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 		print 'sound'
 		#Play target sound
 		soundT = time.time() - start
-		soundId = freqs[LR_target]
-		play_sound(snd_Tpl_All[LR_target]) #play the sound
-		sndL.append([time.time()-start,'_'+str(LR_target)])
+		snd, vol, freq = get_sound(LR_target)
+		play_sound(snd) #play the sound
+		sndList.append([time.time()-start,'_'+'S:'+str(LR_target)+'F:'+str(freq)+'V:'+str(vol)])
+		
 
 		delivered=False
 		
