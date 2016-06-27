@@ -18,11 +18,7 @@ print "Im online :)"
 
 
 # Sounds are played every few seconds, determined by variables that specify wait-time. Reward is automatically delivered
-# after 700ms if the animal does not lick either of the spouts. If the animal does lick either of the spouts, reward is 
-# delivered automatically.
-#
-#
-#
+# after 700ms. Sound is a pure tone in the centre of the frequency space.
 #
 #
 #
@@ -106,9 +102,10 @@ def rew_action(side,rewProcR,rewProcL):
 
 # Stimulus frequencies
 lowF = 8000
-highF = np.logspace(np.log10(8000),np.log10(32000),num=25)[18]
+highF = lowF*2**(1.5)
 centreFreq = np.logspace(lowF,highF,num=3)[1]
 freqs = [highF,lowF]
+
 
 
 
@@ -267,11 +264,6 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 			lickList.append([lickT - start,'L'])
 
 			prevL = time.time()
-			if delivered==False:
-				rewT = time.time() - start
-				rewList.append([rewT,'_'+str(['R' if LR_target==0 else 'L'][0])])
-				LR_target = rew_action(LR_target,rewProcR,rewProcL)
-				delivered=True
 	    else:
 			prevL = time.time()
 
@@ -282,11 +274,6 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 			lickList.append([lickT - start,'R'])
 
 			prevL = time.time()
-			if delivered==False:
-				rewT = time.time() - start
-				rewList.append([rewT,'_'+str(['R' if LR_target==0 else 'L'][0])])
-				LR_target = rew_action(LR_target,rewProcR,rewProcL)
-				delivered=True
 	    else:
 			prevL = time.time()
                 

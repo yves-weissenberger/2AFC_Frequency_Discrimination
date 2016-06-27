@@ -113,7 +113,7 @@ def rew_action(side,rewProcR,rewProcL):
 # Stimulus frequencies
 #frequencies spaced one and half octaves apart
 lowF = 8000
-highF = np.logspace(np.log10(8000),np.log10(32000),num=25)[18]
+highF = lowF*2**(1.5)
 centreFreq = np.logspace(lowF,highF,num=3)[1]
 freqs = [highF,lowF]
 

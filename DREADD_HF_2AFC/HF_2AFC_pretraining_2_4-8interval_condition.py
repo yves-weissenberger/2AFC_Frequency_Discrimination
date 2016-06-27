@@ -14,6 +14,18 @@ from pygame.locals import *
 
 print "Im online :)"
 
+#
+# 
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
 
 
 #-----------------------------------------------------------------
@@ -205,18 +217,7 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 
 	#if 5 seconds have elapsed since the last data_send
 	if (time.time()-sendT>5):
-
-		sndStr = 'sndList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in sndList])
-		lickStr = 'LickList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in lickList])
-		rewStr = 'rewList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in rewLst])
-		sendStr = ','.join([rewStr,sndStr,lickStr])
-			    
-		sendProc = billiard.Process(target=send_data,args=(sendStr,))
-		sendProc.start()
-		print 'seeeeeending', (time.time()-start-soundT)
-		#send_data(sendStr)
-		sendT = time.time()
-		sndList = []; lickList = []; rewLst = [];
+        lickList, rewList,sndList, sendT = data_sender(lickList,rewList,sndList,sendT)
 
 
     
