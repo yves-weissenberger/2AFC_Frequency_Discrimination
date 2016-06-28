@@ -18,7 +18,7 @@ print "Im online :)"
 
 
 
-# Sounds are played every few seconds, determined by variables that specify wait-time. Reward is automatically delivered
+# Sounds are played every few seconds, determined by variables that specify wait-time. Reward is automatically delivered on one side
 # after 700ms. Sound is a pure tone in the centre of the frequency space.
 #
 #
@@ -151,22 +151,31 @@ def gensin(frequency=12000, duration=dur, sampRate=sR, edgeWin=0.01):
     
     return wave.astype('int16')
 
-#_____________________________________________________________________________
+#___________________Functions to Generate Sounds with___________________
 
+def get_click_snd(clickL=10):
+    Click = np.array([0]*clickL + [1]*clickL + [0]*clickL)
+    click = pygame.sndarray.make_sound(np.round(Click*max16bit).astype('int16'))
+    return click
 
 
 def get_sound(idx):
     volume = np.random.randint(40,140)/100
-    freq_adj = np.random.normal(loc=0,scale=1/6)
-    freq = centreFreq*2**(freq_adj)
-    print freq
+    freq_mean = freqs[idx]
+   
+    if idx==0:
+        freq= boundary+1000
+        while (freq>boundary or freq<2000):
+            freq =  freq_mean*2**(np.random.standard_t(df=df,size=1)/(var*2))
+            
+    elif idx==1:
+        freq= boundary-1000
+        while (freq<boundary or freq>47000):
+            freq = freq_mean*2**(np.random.standard_t(df=df,size=1)/(var*2))
+   
     sndArr = gensin(frequency=freq)
-    print volume
-    SOUND = np.round(sndArr.astype('float') * volume)
-    snd = pygame.sndarray.make_sound(SOUND.astype('int16'))
-    return snd, volume, freq
-
-
+    SOUND = sndArr.astype('float') * volume
+    return SOUND.astype('int16'), volume, freq
 def play_sound(sound):
     sound.play()
 
@@ -220,7 +229,7 @@ minW = 4; maxW = 8
 waittime = np.random.randint(minW,maxW)
 
 
-while time.time() - start < ExpDur and rewTot <= rewTotMax:
+while ( (time.time() - start) < ExpDur):
 
     #if 5 seconds have elapsed since the last data_send
     if (time.time()-sendT>5):

@@ -157,14 +157,21 @@ def gensin(frequency=12000, duration=dur, sampRate=sR, edgeWin=0.01):
 
 def get_sound(idx):
     volume = np.random.randint(40,140)/100
-    freq_adj = np.random.normal(loc=0,scale=1/6)
-    freq = centreFreq*2**(freq_adj)
-    print freq
+    freq_mean = freqs[idx]
+   
+    if idx==0:
+        freq= boundary+1000
+        while (freq>boundary or freq<2000):
+            freq =  freq_mean*2**(np.random.standard_t(df=df,size=1)/(var*2))
+            
+    elif idx==1:
+        freq= boundary-1000
+        while (freq<boundary or freq>47000):
+            freq = freq_mean*2**(np.random.standard_t(df=df,size=1)/(var*2))
+   
     sndArr = gensin(frequency=freq)
-    print volume
-    SOUND = np.round(sndArr.astype('float') * volume)
-    snd = pygame.sndarray.make_sound(SOUND.astype('int16'))
-    return snd, volume, freq
+    SOUND = sndArr.astype('float') * volume
+    return SOUND.astype('int16'), volume, freq
 
 
 def play_sound(sound):

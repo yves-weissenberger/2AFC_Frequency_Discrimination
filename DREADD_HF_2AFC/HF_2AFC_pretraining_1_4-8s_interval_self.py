@@ -152,23 +152,33 @@ def gensin(frequency=12000, duration=dur, sampRate=sR, edgeWin=0.01):
     
     return wave.astype('int16')
 
-#_____________________________________________________________________________
+#___________________Functions to Generate Sounds with___________________
 
-# make one big list with all sine waves and prepare those sounds
-#snd_list = [gensin(frequency=f) for f in freqs]
-#snd_Tpl_All = [pygame.sndarray.make_sound(SOUND.astype('int16')) for SOUND in snd_list]
 
-# prepare first sound to play
-snd_Tpl = snd_Tpl_All[initIdx]
-
+def get_click_snd(clickL=10):
+    Click = np.array([0]*clickL + [1]*clickL + [0]*clickL)
+    click = pygame.sndarray.make_sound(np.round(Click*max16bit).astype('int16'))
+    return click
 
 def get_sound(idx):
-	volume = np.random.randint(40,140)/100
-	freq = np.random.lognormal(mean=np.log(freqs[idx]),sigma=1/24,size=1)
-	sndArr = gensin(frequency=freq)
-	SOUND = sndArr * volume
-	snd = pygame.sndarray.make_sound(SOUND.astype('int16'))
-	return snd, volume, freq
+    volume = np.random.randint(40,140)/100
+    freq_mean = freqs[idx]
+   
+    if idx==0:
+        freq= boundary+1000
+        while (freq>boundary or freq<2000):
+            freq =  freq_mean*2**(np.random.standard_t(df=df,size=1)/(var*2))
+            
+    elif idx==1:
+        freq= boundary-1000
+        while (freq<boundary or freq>47000):
+            freq = freq_mean*2**(np.random.standard_t(df=df,size=1)/(var*2))
+   
+    sndArr = gensin(frequency=freq)
+    SOUND = sndArr.astype('float') * volume
+    return SOUND.astype('int16'), volume, freq
+
+
 
 
 def play_sound(sound):
@@ -199,18 +209,14 @@ def data_sender(lickList,rewList,sndList,sendT):
 # START of the Experiment
 
 #initialize data lists (for licks and tones)
-lickList = [] #[[soundIdx],[lickID],[lickT]]
-soundList = [] #[[soundIdx],[soundFreq],[soundT]]
+lickList = []; soundList = []; rewList = []; sndList = []
+
 
 # initialize counters
 soundIdx = 0
 rewTot = 0
 
 start = time.time() #THIS IS THE T=0 POINT
-
-lickLst = []
-rewList = []
-sndList = []
 
 sendT = time.time()
 lickT = time.time()
@@ -225,7 +231,7 @@ minW = 4; maxW = 8
 waittime = np.random.randint(minW,maxW)
 
 
-while time.time() - start < ExpDur and rewTot <= rewTotMax:
+while ( (time.time() - start) < ExpDur):
 
 	#if 5 seconds have elapsed since the last data_send
 	if (time.time()-sendT>5):
@@ -241,7 +247,7 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 		soundId = freqs[LR_target]
 		snd, vol, freq = get_sound(LR_target)
 		play_sound(snd) #play the sound
-		sndList.append([time.time()-start,'_'+'S:'+str(LR_target)+'F:'+str(freq)+'V:'+str(vol)])
+		sndList.append([time.time()-start,'_'+'S:'+str(LR_target)+'_F:'+str(freq)+'_V:'+str(vol)])
 		waittime = np.random.randint(minW,maxW)
 
 		delivered=False

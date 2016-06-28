@@ -10,11 +10,19 @@ import pygame
 import sys
 import random
 from pygame.locals import *
-
+import socket
 
 print "Im online :)"
 
 
+#One of the two target sounds are played every few seconds, determined by variables that specify wait-time.
+#If the mouse licks the correct side it receives a reward immediately. If not then reward is delivered
+#automatically 1s after the onset of the stimulus
+#
+#
+#
+#
+#
 
 #-----------------------------------------------------------------
 #Initialise function for sending data to server
@@ -91,14 +99,16 @@ def rew_action(side,rewProcR,rewProcL):
 # Task parameters
 
 # Stimulus frequencies
-centrFreq = 12 * 10**3 #in Hz
-
+lowF = 8000
+highF = lowF*2**(1.5)
+centrFreq = np.logspace(np.log10(lowF),np.log10(highF),num=3)[1]
+freqs = [lowF,highF]
 # Stimulus timing
 dur = 0.2 # duration of a sound, in seconds
 waitS = 6
 waitL = 12
 # Experiment structure 
-ExpDur = 120000 #max total duration in seconds
+ExpDur = 45*60 #max total duration in seconds
 NumT = ExpDur / waitL
 
 # Reward stuff
@@ -108,24 +118,18 @@ rewTotMax = 300 #total number of rewards allowed in one experimental block, befo
 minILI = 0.05 #minimum inter-lick interval in seconds; for two lick-detections to be considered two seperate licks
 nStims = 2
 #_____________________________________________________________________________
+sR = 96000 # sampling rate = 96 kHz
 
 #initialise the sound mixer
-pygame.mixer.pre_init(96000,-16,1,256) #if jitter, change 256 to different value
+pygame.mixer.pre_init(sR,-16,1,256) #if jitter, change 256 to different value
 pygame.init()
 
-#_____________________________________________________________________________
-
-# choose target and initial frequencies
-freqs = [6000,24000]
-initIdx = 0
-initFreq = freqs[initIdx]
 
 #_____________________________________________________________________________
 #make sine waves one by one
 
-max24bit = np.array(16777210,dtype='float32')
+max24bit = 16777210
 max16bit = 32766
-sR = 96000 # sampling rate = 96 kHz
 
 def gensin(frequency=12000, duration=dur, sampRate=sR, edgeWin=0.01):
     cycles = np.linspace(0,duration*2*np.pi,num=duration*sampRate)
@@ -141,26 +145,24 @@ def gensin(frequency=12000, duration=dur, sampRate=sR, edgeWin=0.01):
 
 
 
-def get_stim(sndArray,LR_target):
+def get_sound(idx):
+    volume = np.random.randint(40,140)/100
+    freq_mean = freqs[idx]
+   
+    if idx==0:
+        freq= boundary+1000
+        while (freq>boundary or freq<2000):
+            freq =  freq_mean*2**(np.random.standard_t(df=df,size=1)/(var*2))
+            
+    elif idx==1:
+        freq= boundary-1000
+        while (freq<boundary):
+            freq = freq_mean*2**(np.random.standard_t(df=df,size=1)/(var*2))
+   
+    sndArr = gensin(frequency=freq)
+    SOUND = sndArr.astype('float') * volume
+    return SOUND.astype('int16'), volume, freq
 
-   sndNr = rnd.randint( (LR_target*nStims/2),nStims/2+(LR_target*nStims/2))
-   deltaV = rnd.uniform(0.8,1.2)
-   stim = pygame.sndarray.make_sound(
-				np.round(sndArray[sndNr]*deltaV).astype('int16'))
-
-   return stim, sndNr, deltaV
-
-
-#_____________________________________________________________________________
-
-# make ones big list with all sine waves and prepare those sounds
-snd_list = [gensin(frequency=f) for f in freqs]
-snd_Tpl_All = [pygame.sndarray.make_sound(SOUND.astype('int16')) for SOUND in snd_list]
-clickL = 10
-Click = np.array([0]*clickL + [1]*clickL + [0]*clickL)
-click = pygame.sndarray.make_sound(np.round(Click*max16bit).astype('int16'))
-# prepare first sound to play
-snd_Tpl = snd_Tpl_All[initIdx]
 
 #_____________________________________________________________________________
 
@@ -183,7 +185,7 @@ start = time.time() #THIS IS THE T=0 POINT
 
 lickLst = []
 rewLst = []
-sndL = []
+sndList = []
 rewList = []
 sendT = time.time()
 lickT = time.time()
@@ -201,43 +203,32 @@ sndLat = 0.8  #time between the click and the target stimulus
 get_ITI = lambda mu: np.abs(np.random.normal(loc=0,scale=1) + mu)
 ITI = get_ITI(waitS)
 isPlaying = True
-while time.time() - start < ExpDur and rewTot <= rewTotMax:
+
+while ( (time.time() - start) < ExpDur):
 
 	#if 5 seconds have elapsed since the last data_send
 	if (time.time()-sendT>5):
-
-		sndStr = 'sndList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in sndL])
-		lickStr = 'LickList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in lickList])
-		rewStr = 'rewList:' + '-'.join([str(np.round(entry[0],decimals=3))+entry[1] for entry in rewLst])
-		sendStr = ','.join([rewStr,sndStr,lickStr])
-			    
-		sendProc = billiard.Process(target=send_data,args=(sendStr,))
-		sendProc.start()
-		print 'seeeeeending', (time.time()-start-soundT)
-		#send_data(sendStr)
-		sendT = time.time()
-		sndL = []; lickList = []; rewLst = [];
+        lickList, rewList,sndList, sendT = data_sender(lickList,rewList,sndList,sendT)
 
 
         
-	if (time.time()-start-clickT)>ITI:
+	if (time.time()-start-soundT)>ITI:
 		print 'sound'
 		#Play target sound
 		if firstLick == False:
-                    pass#LR_target = np.random.randint(0,2)
+            pass#LR_target = np.random.randint(0,2)
 		clickT = time.time() - start
-		stim, sndNr, deltaV = get_stim(snd_list,LR_target)
+		stim, sndNr, deltaV = get_sound(LR_target)
 		soundId = freqs[LR_target]
 		play_sound(click) #play the sound
-		sndL.append([time.time()-start,'_'+'click'])
 		isPlaying = False
 
 
         if ((time.time() - start - clickT)>sndLat and isPlaying==False):
             soundT = time.time() - start
             play_sound(snd_Tpl_All[LR_target])
-	    firstLick = False
-            sndL.append([time.time()-start,'_'+str(LR_target)])
+	        firstLick = False
+            sndList.append([time.time()-start,'_'+str(LR_target)])
             isPlaying = True
 
 	

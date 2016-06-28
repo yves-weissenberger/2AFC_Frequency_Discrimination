@@ -10,36 +10,39 @@ import pygame
 import sys
 import random
 from pygame.locals import *
+import socket
 
 
 print "Im online :)"
 
 
+#One of the two target sounds are played every few seconds, determined by variables that specify wait-time.
+#If the mouse licks the correct side it receives a reward immediately. If not then reward is delivered
+#automatically 1s after the onset of the stimulus
+#
+#
+#
+#
+#
 
-#-----------------------------------------------------------------
-#Initialise function for sending data to server
-
-#Figure out appropriate IP address based on the server
-pi_IP = [(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]
-pi_ID = str(int(pi_IP[-3:])-100)
+#_____________________________________________________________________________
 
 
 def send_data(load):
 
     headers = {'User-Agent': 'Mozilla/5.0'}
-    link = 'http://192.168.0.99:8000/getData/' + pi_ID + '/get_PiData/'
+    link = 'http://192.168.0.99:8000/getData/' + '1' + '/get_PiData/'
 
     session = req.Session()
     r1 = session.get(link,headers=headers)
 
-    link1 = 'http://192.168.0.99:8000/getData/' + pi_ID + '/write_PiData/'
+    link1 = 'http://192.168.0.99:8000/getData/' + '1' + '/write_PiData/'
 
 
     payload = {'piData':load,'csrfmiddlewaretoken':r1.cookies['csrftoken']}
     #cookies = dict(session.cookies)
     session.post(link1,headers=headers,data=payload)
     return None
-
 
 
 
@@ -96,17 +99,19 @@ centrFreq = 12 * 10**3 #in Hz
 
 # Stimulus timing
 dur = 0.2 # duration of a sound, in seconds
-waitS = 6
-waitL = 12
+ISI = 10 # max time between two sound-onsets, in seconds
+waittime = 8 #waiting time from moment both spouts have been licked, to presentation of next stimulus
+
 # Experiment structure 
-ExpDur = 120000 #max total duration in seconds
-NumT = ExpDur / waitL
+ExpDur = 45*60 #max total duration in seconds
+NumT = ExpDur / ISI
 
 # Reward stuff
 rewTotMax = 300 #total number of rewards allowed in one experimental block, before it is aborted
 
 # Other stuff
 minILI = 0.05 #minimum inter-lick interval in seconds; for two lick-detections to be considered two seperate licks
+
 #_____________________________________________________________________________
 
 #initialise the sound mixer
@@ -116,9 +121,7 @@ pygame.init()
 #_____________________________________________________________________________
 
 # choose target and initial frequencies
-freqs = np.logspace(np.log10(6000),np.log10(24000),num=6)
-nStims = len(freqs)
-
+freqs = [6000,24000]
 initIdx = 0
 initFreq = freqs[initIdx]
 
@@ -141,26 +144,12 @@ def gensin(frequency=12000, duration=dur, sampRate=sR, edgeWin=0.01):
     
     return wave.astype('int16')
 
-
-
-def get_sound(idx):
-    volume = np.random.randint(40,140)/100
-    freq = np.random.lognormal(mean=np.log(freqs[idx]),sigma=1/24,size=1)
-    sndArr = gensin(frequency=freq)
-    SOUND = sndArr * volume
-    snd = pygame.sndarray.make_sound(SOUND.astype('int16'))
-    return snd, volume, freq
-
-
-
 #_____________________________________________________________________________
 
-# make ones big list with all sine waves and prepare those sounds
+# make one big list with all sine waves and prepare those sounds
 snd_list = [gensin(frequency=f) for f in freqs]
 snd_Tpl_All = [pygame.sndarray.make_sound(SOUND.astype('int16')) for SOUND in snd_list]
-clickL = 10
-Click = np.array([0]*clickL + [1]*clickL + [0]*clickL)
-click = pygame.sndarray.make_sound(np.round(Click*max16bit).astype('int16'))
+
 # prepare first sound to play
 snd_Tpl = snd_Tpl_All[initIdx]
 
@@ -190,7 +179,6 @@ rewList = []
 sendT = time.time()
 lickT = time.time()
 prevL = time.time()
-clickT = time.time() - start
 delivered = True
 soundT = time.time()-start
 # Do the whole experiment in one big LOOP over each sound
@@ -199,10 +187,6 @@ LR_target = np.random.randint(0,2)
 firstLick = False
 noRew = 0
 free = False
-sndLat = 0.8  #time between the click and the target stimulus
-get_ITI = lambda mu: np.abs(np.random.normal(loc=0,scale=1) + mu)
-ITI = get_ITI(waitS)
-isPlaying = True
 while time.time() - start < ExpDur and rewTot <= rewTotMax:
 
 	#if 5 seconds have elapsed since the last data_send
@@ -221,29 +205,47 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
 		sndL = []; lickList = []; rewLst = [];
 
 
-        
-	if (time.time()-start-clickT)>ITI:
+    
+	if (time.time()-start-soundT)>waittime:
 		print 'sound'
 		#Play target sound
+		soundT = time.time() - start
+		soundId = freqs[LR_target]
 		if firstLick == False:
-		    rewLst.append([time.time()-start,'_'+str(['noRespR' if LR_target==0 else 'noRespL'][0])])
-                    pass#LR_target = np.random.randint(0,2)
-		clickT = time.time() - start
-		stim, sndNr, deltaV = get_stim(snd_list,LR_target)
-		print LR_target, sndNr
-		play_sound(click) #play the sound
-		sndL.append([time.time()-start,'_'+'click'])
-		isPlaying = False
+                    noRew +=1
+                else:
+                    pass
+		play_sound(snd_Tpl_All[LR_target]) #play the sound
+		sndL.append([time.time()-start,'_'+str(LR_target)])
 
 
-        if ((time.time() - start - clickT)>sndLat and isPlaying==False):
-            soundT = time.time() - start
-            play_sound(stim)
-	    firstLick = False
-            sndL.append([time.time()-start,'_'+str(sndNr)])
-            isPlaying = True
+                if noRew>= 0:
+                    free = True
+                    firstLick = False
+                else:
+                    firstLick = False
+                    free = False
 
-	
+                if noRew>6:
+                    firstLick = False
+                    free = False
+                    noRew = 0
+
+		
+
+        if free==True:
+            if (time.time() - start - soundT)>0.8:
+
+                if rewList == []:
+                    rewLst.append([rewT,'_'+str(['freeR' if LR_target==0 else 'freeL'][0])])
+		    waittime = 16
+                LR_target = rew_action(LR_target,rewProcR,rewProcL)
+                firstLick = True
+                free = False
+                
+
+
+
         #0 is right, 1 is left
 	if (GPIO.event_detected(lickL)):
             
@@ -259,16 +261,14 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
                         rewLst.append([rewT,'_'+str(['R' if LR_target==0 else 'L'][0])])
                         LR_target = rew_action(LR_target,rewProcR,rewProcL)
                         noRew = 0
-			ITI = get_ITI(waitS)
-
+			waittime = 4
                     else:
                         if firstLick==False:
                             #LR_target = np.random.randint(0,2)
                             noRew += 1
                             rewLst.append([rewT,'_'+str(['noR' if LR_target==0 else 'noL'][0])])
-                            ITI = get_ITI(waitL)
 
-                                        
+                
 		prevL = time.time()
 		firstLick = True
 	    else:
@@ -288,19 +288,16 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
                         rewLst.append([rewT,'_'+str(['R' if LR_target==0 else 'L'][0])])
                         LR_target = rew_action(LR_target,rewProcR,rewProcL)
                         noRew = 0
-			ITI = get_ITI(waitS)
-
+			waittime = 4
                     else:
                        if firstLick==False:
                             #LR_target = np.random.randint(0,2)
                             noRew += 1
                             rewLst.append([rewT,'_'+str(['noR' if LR_target==0 else 'noL'][0])])
-                            ITI = get_ITI(waitL)
-                            
+
 
 		prevL = time.time()
 		firstLick = True
 	    else:
 		prevL = time.time()
                 
-
