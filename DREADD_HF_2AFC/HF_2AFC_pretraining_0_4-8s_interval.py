@@ -248,11 +248,11 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
         rewList.append([rewT,'_LR'])
         
         if LR_target==0:
-                _ = rew_action(0,rewProcR,rewProcL)
-                LR_target = rew_action(1,rewProcR,rewProcL)
-            else:
-                _ = rew_action(1,rewProcR,rewProcL)
-                LR_target = rew_action(0,rewProcR,rewProcL)
+            _ = rew_action(0,rewProcR,rewProcL)
+            LR_target = rew_action(1,rewProcR,rewProcL)
+        else:
+            _ = rew_action(1,rewProcR,rewProcL)
+            LR_target = rew_action(0,rewProcR,rewProcL)
 
         
     
