@@ -271,3 +271,4 @@ while time.time() - start < ExpDur and rewTot <= rewTotMax:
         else:
             prevL = time.time()
                 
+
