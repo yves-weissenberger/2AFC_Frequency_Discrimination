@@ -1,0 +1,5 @@
+function [sound, vol, frq] = get_stim(centreFreq)
+
+frq = centreFreq
+
+end
