@@ -67,7 +67,7 @@ Stimuli are all stochastic. They are drawn from either log-normal (MATLAB code) 
   </li>
   
   <li>
-  Mice lose motivation and stop responding entirely (??!)
+  Mice lose motivation and stop responding entirely (should include manual reward delivery!!!!)
   </li>
   
   <li>

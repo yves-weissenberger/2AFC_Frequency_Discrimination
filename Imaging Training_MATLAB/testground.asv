@@ -89,29 +89,15 @@ end
 
 %%
 
-exponents = linspace(-.4,.4,20)
+exponents = np.linspace(0.6,1.4,20)
 
 for exponent = exponents
-    frq = 8000*(2^(exponent));
-    frq
-    snd = gensin(frq,8,params.sampleRate,params.edgeWin);
+    frq = 8000*2^(exponent)
+    
+    snd = gensin(8000*2,3,params.sampleRate,params.edgeWin);
     PsychPortAudio('FillBuffer', pahandle, snd/3);
     PsychPortAudio('Start', pahandle);
-    pause(10)
 
 end
 
 %% 
-
-
-levels = linspace(0.2,2,4);
-
-for level = levels
-    frq = 12000
-    snd = gensin(frq,8,params.sampleRate,params.edgeWin);
-    PsychPortAudio('FillBuffer', pahandle, snd*level);
-    level
-    PsychPortAudio('Start', pahandle);
-    pause(10)
-
-end

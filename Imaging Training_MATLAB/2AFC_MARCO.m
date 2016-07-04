@@ -28,7 +28,7 @@ params = struct(...
 
 addpath(cd);
 
-folder = 'C:\Users\win-ajk009-admin\Documents\Behaviour_Scripts\Two_AFC\';
+folder = 'C:\Users\win-ajk009-admin\Documents\Behaviour_Scripts\Two_AFC\Legacy\';
 %folder = '/Users/samuelpicard/Desktop/Sensorimotor/';
 
 base = [folder 'Data' filesep];
@@ -106,10 +106,10 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     
     
     %% lick detection and processing
-    input = inputSingleScan(s);
-    frame_Nr = input(3);
+    in_READ = inputSingleScan(s);
+    frame_Nr = in_READ(3);
     %Here side is R or L when lick_side is 1 or 2, respectively
-    [licked, side, lick_side, prevL] = proc_lick_2AFC(input,tStart, prevL);
+    [licked, side, lick_side, prevL] = proc_lick_2AFC(in_READ,tStart, prevL);
         
     
     %update text file with lick times
