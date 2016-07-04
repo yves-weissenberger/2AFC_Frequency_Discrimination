@@ -95,19 +95,40 @@ for exponent = exponents
     frq = 8000*(2^(exponent));
     frq
     snd = gensin(frq,8,params.sampleRate,params.edgeWin);
-    PsychPortAudio('FillBuffer', pahandle, snd/3);
+    PsychPortAudio('FillBuffer', pahandle, (1/2)*snd/3);
     PsychPortAudio('Start', pahandle);
     pause(10)
 
 end
 
+
+
+%%
+
+
+
+%%
+
+frqs = logspace(log10(2000),log10(32000),100);
+iii = 0
+for frq = frqs
+    iii = iii+1
+    frq
+    snd = gensin(frq,5,params.sampleRate,params.edgeWin);
+    PsychPortAudio('FillBuffer', pahandle, (1/2)*snd/3);
+    PsychPortAudio('Start', pahandle);
+    pause(7)
+
+end
+
+
 %% 
 
 
-levels = linspace(0.2,2,4);
+levels = logspace(log10(0.01),log10(4),10);
 
 for level = levels
-    frq = 12000
+    frq = 32000;
     snd = gensin(frq,8,params.sampleRate,params.edgeWin);
     PsychPortAudio('FillBuffer', pahandle, snd*level);
     level
