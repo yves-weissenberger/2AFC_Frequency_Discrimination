@@ -127,7 +127,7 @@
         %Block of Code to get and play new stimulus
         if (toc(tStart) - sndT) >= curr_ISI
             rew_side = randi([1,2]);
-            curr_ISI = abs(normrnd(params.ISI_MEAN,params.ISI_STD)) + 2;
+            
 
             if params.numSteps>2;
                 sndIdx = randi([1,params.numSteps/2]) + (rew_side-1)*params.numSteps/2;
@@ -151,13 +151,20 @@
 
             %flag specifying whether the animals has responded until now
             resp = false;
+            free = false;
         end
+        
+        if free==true
+            if (toc(tStart)-sndT)>params.sndRewIntv
+                rew_mtx = [1,1];
+                           fprintf(fileID,strcat('rew:',num2str('RL'),'_',num2str(rewT),'_',num2str(frame_Nr),'\n'));
+
 
         if (toc(tStart)-sndT)>params.sndRewIntv
             rew_mtx = [1,1];
             fprintf(fileID,strcat('rew:',num2str('RL'),'_',num2str(rewT),'_',num2str(frame_Nr),'\n'));
             outputSingleScan(s,rew_mtx);
-            fprint('reward')
+            'reward'
             rewT =  toc(tStart);
             rewOn = true;
             rewCnt = rewCnt + 1;
@@ -170,10 +177,8 @@
             outputSingleScan(s,[0,0]) %close solenoids
             rewOn = false;
        end
-       
-       if (toc(tStart)-screenUpDateT)>2
-           fprint('\n');
-       end
+
+
 
     end
 

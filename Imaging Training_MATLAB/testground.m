@@ -55,7 +55,6 @@ while true
     [licked, side, lick_side, prevL] = proc_lick_2AFC(input,tStart, prevL);
     
     if side~=99
-        side
     end
     
     %update text file with lick times
@@ -135,4 +134,13 @@ for level = levels
     PsychPortAudio('Start', pahandle);
     pause(10)
 
+    
+    
 end
+
+
+
+%%
+
+side = 'R';
+fprintf('lick %s at time: %f\n',side,5.2)
