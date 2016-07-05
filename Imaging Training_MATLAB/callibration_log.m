@@ -17,19 +17,28 @@ plot(frqs,longsweep_2_32_03)
 
 
 %% Fit Data
-
+%Here we fit the offsets of the frequencies
 x1 = 1:n;
-p = polyfit(x1,longsweep_2_32_03,4);
+global p
+p = polyfit(frqs,longsweep_2_32_03,12);
+
+x1 = linspace(min(frqs),max(frqs),100001);
 y1 = polyval(p,x1);
 hold on 
 plot(frqs,longsweep_2_32_03,'o')
-plot(frqs,y1)
+plot(x1,y1,'.')
 hold off
 
         
 figure()
-hist(longsweep_2_32_03-y1)
+hist(longsweep_2_32_03-polyval(p,frqs))
 
+
+%% Now we get those offset
+
+%get_offset = @(x) polval(p,x);
+get_offset = @(p,x) polyval(p,x);
+get_offset(p,600)
 %%
 levels_8kHz_sweep_03 = [77.3,75.8,74.9,74.2,74.8,74.4,73.9,72.7,72.1,71.1,71.1,70.9,70.2,69.9,69.2,68.9,68.8,69.1,68.8,68.2];
 levels_8kHz_sweep_015 =[71.4,69.6,69.1,68.0,68.9,68.5,68.0,66.8,66.4,65.4,65.1,65.0,64.4,64.0,63.3,63.6,63.0,63.2,62.6,62.5];
@@ -80,15 +89,15 @@ level_Mtx_deltaLevel = cat(1,levels_8kHz_deltaLevel, ...
 
                          
 hold on                        
-plot(levels,level_Mtx_deltaLevel + repmat(level_Mtx_deltaLevel(1,1) - level_Mtx_deltaLevel(:,1),1,10),'o-')
+%plot(levels,level_Mtx_deltaLevel + repmat(level_Mtx_deltaLevel(1,1) - level_Mtx_deltaLevel(:,1),1,10),'o-')
 
 
-%hold on
-%plot(levels,levels_8kHz_deltaLevel,'o-')
-%plot(levels,levels_16kHz_deltaLevel,'o-')
-%plot(levels,levels_32kHz_deltaLevel,'o-')
+hold on
+plot(levels,levels_8kHz_deltaLevel,'o-')
+plot(levels,levels_16kHz_deltaLevel,'o-')
+plot(levels,levels_32kHz_deltaLevel,'o-')
 
-%hold off
+hold off
 
 
 %So this implies that there is an exponential relationship between "gain
@@ -109,26 +118,73 @@ y = reshape(gainData,1,30);
 
 hold on                        
 plot((level_Mtx_deltaLevel + repmat(level_Mtx_deltaLevel(1,1) - level_Mtx_deltaLevel(:,1),1,10))','o-')
-
-f = fit(x',y','exp2');
+%%
+f = fit(x',y','power2'); 
 plot(f,x,y);
 
-%%
-p2 = polyfit(x,y,6);
-y1 = polyval(p2,x);
+%% polynomial fit
+p2 = polyfit(x,y,4);
+x1 = x;
+x1= linspace(0,4,1001);
+y1 = polyval(p2,x1);
 hold on 
 plot(x,y,'o')
-plot(x,y1)
+plot(x1,y1)
 hold off
 
-%%
 
+%% Find roots
+
+global target
+target = 60;
+f = @(x) polyval(p,x) - target;
+tic
+
+fzero(f,1)
+toc
+
+
+%% Spline fit
+global f
+f = fit(x', y', 'smoothingspline');
+plot(f,x,y);
+
+spline_fit = @(x) feval(f,x);
+
+
+
+gain_factors = linspace(0,5,1001);
+fit_vals = f(gain_factors);
+
+%% 
+
+target_level = 60;
+gain_factors(argmin(abs(target_level-fit_vals)))
+%%
+f = @(x) polyval(p,x) - target;
+
+%%
+modelFun = @(b,x) b(1).*log2(1+b(2).*x - b(3));
+out = nlinfit(x',y',modelFun,rand(3,1));
+
+hold on
+plot(x,y,'o')
+plot(x1,modelFun(out,x1))
+%%
 
 xx = linspace(min(levels),max(levels),40);
 yy = spline(levels,gainData(1,:),xx);
 hold on
 plot(x(1:30),y(1:30),'o')
 plot(xx,yy)
+
+
+%% Inverse Exponential
+
+funa = @(b,x) b(1) -1./(1+exp(x.*b(2) -b(3)));
+out = nlinfit(x',y',funa,rand(2));
+plot(x,funa(out,x))
+
 
 %%
 figure()
