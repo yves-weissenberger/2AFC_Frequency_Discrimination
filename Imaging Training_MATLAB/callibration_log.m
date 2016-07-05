@@ -195,3 +195,79 @@ plot(ones(4)*3,levels_16kHz_deltaLevel/max(levels_16kHz_deltaLevel),'o')
 plot(ones(4)*4,levels_32kHz_deltaLevel/max(levels_32kHz_deltaLevel),'o')
 
 xlim([0,6])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%% calibration log 
+%here record the lvel of a bunch of an 32Khz Pure tone presented at many
+%different levels
+%Can use very low gain factors for low frequencies then (ie around 0.001).
+%For high frequency stimuli, can then 
+
+
+%Notes: 
+%1. Characterise frequencies with current gain on the amplifier and and 0.5
+%this will get the level offset for all stimuli. Then get the level
+%calibration curve at 
+
+InitializePsychSound(1);
+pahandle = PsychPortAudio('Open', [], 1, [], params.sampleRate, 1, [], 0.015);
+%%
+
+levels = logspace(log10(0.01),log10(0.1),2);
+
+snd_dur = 20;
+for level = levels
+    frq = 2000;
+    snd = gensin(frq,snd_dur,params.sampleRate,params.edgeWin);
+    PsychPortAudio('FillBuffer', pahandle, snd*level);
+    level
+    PsychPortAudio('Start', pahandle);
+    pause(snd_dur+3)
+
+    
+    
+end
+%%
+
+measured_levels = [
+                    
+                    ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
