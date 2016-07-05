@@ -99,8 +99,36 @@ plot(levels,level_Mtx_deltaLevel + repmat(level_Mtx_deltaLevel(1,1) - level_Mtx_
 
 
 %% Analysis
+%Fit exponential function to the data from different frequencies to fit
+%gain parameter
+
+gainData = level_Mtx_deltaLevel + repmat(level_Mtx_deltaLevel(1,1) - level_Mtx_deltaLevel(:,1),1,10);
+
+x = reshape(repmat(levels,3,1),1,30)
+y = reshape(gainData,1,30);
+
+hold on                        
+plot((level_Mtx_deltaLevel + repmat(level_Mtx_deltaLevel(1,1) - level_Mtx_deltaLevel(:,1),1,10))','o-')
+
+f = fit(x',y','exp2');
+plot(f,x,y);
+
+%%
+p2 = polyfit(x,y,6);
+y1 = polyval(p2,x);
+hold on 
+plot(x,y,'o')
+plot(x,y1)
+hold off
+
+%%
 
 
+xx = linspace(min(levels),max(levels),40);
+yy = spline(levels,gainData(1,:),xx);
+hold on
+plot(x(1:30),y(1:30),'o')
+plot(xx,yy)
 
 %%
 figure()
