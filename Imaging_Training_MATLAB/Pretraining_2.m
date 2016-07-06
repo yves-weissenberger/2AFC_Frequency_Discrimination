@@ -9,12 +9,12 @@ params = struct(...
     'numOct', 1.5, ...           %range of sounds in Octaves
     'minfreq',8000, ...        %min sound frequency in Hz
     'maxfreq',8000*(2^1.5), ...        %max sound frequency in Hz
-    'numSteps',3, ...
+    'numSteps',2, ...
     'sampleRate',192000, ...   %audio sample rate in Hz
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
     'rewDur',0.08,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
-    'ISI_MEAN',6,...        %inter stimulus interval
+    'ISI_MEAN',3,...        %inter stimulus interval
     'ISI_STD',2,...
     'maxDur',2700, ...          %maximum time of experiment in seconds
     'sndRewIntv',0.7 ...
@@ -28,16 +28,17 @@ params = struct(...
 
 addpath(cd);
 
-folder = 'C:\Users\win-ajk009-admin\Documents\Behaviour_Scripts\Two_AFC\Imaging Training_MATLAB';
+folder = 'C:\Users\win-ajk009-admin\Documents\Behaviour_Scripts\Two_AFC\Imaging_Training_MATLAB\';
 %folder = '/Users/samuelpicard/Desktop/Sensorimotor/';
 
 base = [folder 'Data' filesep];
 fTime = datestr(datetime('now','TimeZone','local'),'yyyymmdd-HHMMSS');
 subj = input('Type subject name: ','s');
 
-fName = ['2AFC_' subj '_' fTime '_data.txt'];
+fName = ['Pretaining2_' subj '_' fTime '_data.txt'];
 file_loc = strcat(base,fName);
 fileID = fopen(file_loc,'at+');
+
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -49,17 +50,16 @@ device = daq.getDevices;
 dev =  device(1);
 
 
-addDigitalChannel(s,dev.ID, 'Port0/Line0:1', 'InputOnly');
+addDigitalChannel(s,dev.ID, 'Port0/Line0:3', 'InputOnly');
 
 %Setup digital outputs
 addDigitalChannel(s,dev.ID,'Port1/Line2:3','OutputOnly')
 outputSingleScan(s,[1,1])
-outputSingleScan(s,[0,0])
+outputSingleScan(s,[0,0]) 
 
 
 % P2.7 can be configured as a counter; that is pin 9
 addCounterInputChannel(s,dev.ID,0,'EdgeCount');
-
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -69,20 +69,14 @@ addCounterInputChannel(s,dev.ID,0,'EdgeCount');
 InitializePsychSound(1);
 pahandle = PsychPortAudio('Open', [], 1, [], params.sampleRate, 1, [], 0.015);
 
-global frqs sndMat
+global frqs
 
 
-f_span = logspace(log10(params.minfreq),log10(params.maxfreq),params.numSteps);
+f_span = logspace(log10(params.minfreq),log10(params.maxfreq),3);
 centreFreq = f_span(2);
 frqs = [8000,8000*2^1.5];
-i = 1;
-sndMat = cell(1);
 
-%generate sounds
-for frq = frqs
-    sndMat{i} = gensin(frq,params.sndDur,params.sampleRate,params.edgeWin);
-    i = i+1;
-end
+
 
 
 
@@ -92,7 +86,7 @@ end
 
 
 %initialise the timers
-tStart = tic; prevL = toc(tStart); sndT = toc(tStart); rewT = prevL;
+tStart = tic; prevL = toc(tStart); sndT = toc(tStart); rewT = prevL; screenUpdateT = toc(tStart);
 
 
 %initialise the counters
@@ -103,15 +97,17 @@ rewOn = false;
 prevSnd = 0;
 resp = true;
 licked = false;
+free = false;
 side = 99;
+
+rew_mtx = [0,0];
 
 %intialise ITI
 curr_ISI = abs(normrnd(params.ISI_MEAN,params.ISI_STD)) + 2;
 
-while toc(tStart)<params.maxDur && rewCnt<params.maxRew
+while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
     
     
-    %% lick detection and processing
     %% lick detection and processing
     input = inputSingleScan(s);
     frame_Nr = input(3);
@@ -152,8 +148,9 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
             sndIdx = rew_side;
         end
         
+        'in'
         [snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params);
-        
+        'out'
         %PLAY SOUND
         PsychPortAudio('FillBuffer', pahandle, snd);
         PsychPortAudio('Start', pahandle);
@@ -183,13 +180,14 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
             rewOn = true; %set reward to being delivered
             rewCnt = rewCnt+1; %increment reward counter
             fprintf(fileID,strcat('rew:',num2str(rew_side),'_',num2str(rewT),'_',num2str(frame_Nr),'\n')); %print rew to file
+            free = false;
         end
     end
     
     %% Response ckecing
     %If the mouse licks either right or left
-    if (side=='R' || side=='L')
-        'responded'
+    if any(lick_side==[1,2])
+        fprintf('responded')
         %if the mouse has not responded yet and is within the response
         %window
         if (resp==false && (toc(tStart)-sndT)<params.sndRewIntv-0.1)
@@ -198,7 +196,7 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
                 rew_mtx = [0,0];
                 rew_mtx(rew_side) = 1;  %set reward to be delivered
                 outputSingleScan(s,rew_mtx);   %deliver reward on the appropriate side
-                Disp('reward')
+                fprintf('reward')
                 rewT =  toc(tStart);
                 rewOn = true;
                 rewCnt = rewCnt+1;
@@ -218,12 +216,18 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     if ( (toc(tStart)-rewT )>params.rewDur && rewOn )
         outputSingleScan(s,[0,0]) %close solenoids
         rewOn = false;
+        free = false;
+    end
+    
+    if (toc(tStart)-screenUpdateT)>2
+        fprintf('\n');
+        screenUpdateT = toc(tStart);
     end
     
     
-    
 end
-
-
+%%
+'end'
+outputSingleScan(s,[0,0])
 PsychPortAudio('Close');
 
