@@ -28,7 +28,7 @@
 
     addpath(cd);
 
-    folder = 'C:\Users\win-ajk009-admin\Documents\Behaviour_Scripts\Two_AFC\Imaging Training_MATLAB';
+    folder = 'C:\Users\win-ajk009-admin\Documents\Behaviour_Scripts\Two_AFC\Imaging_Training_MATLAB\';
     %folder = '/Users/samuelpicard/Desktop/Sensorimotor/';
 
     base = [folder 'Data' filesep];
@@ -92,7 +92,8 @@
 
 
     %initialise the timers
-    tStart = tic; prevL = toc(tStart); sndT = toc(tStart); rewT = prevL;
+    tStart = tic; prevL = toc(tStart); sndT = toc(tStart); rewT = prevL; screenUpdateT = toc(tStart);
+
 
 
     %initialise the counters
@@ -107,7 +108,9 @@
 
     %intialise ITI
     curr_ISI = abs(normrnd(params.ISI_MEAN,params.ISI_STD)) + 2;
-
+    
+    %in this case 
+    snd =  cat(2,zeros(1,50),ones(1,5),-ones(1,5),zeros(1,50))
     while toc(tStart)<params.maxDur && rewCnt<params.maxRew
 
 
@@ -128,15 +131,16 @@
         if (toc(tStart) - sndT) >= curr_ISI
             rew_side = randi([1,2]);
             curr_ISI = abs(normrnd(params.ISI_MEAN,params.ISI_STD)) + 2;
+            
+            %if want to use centre frequency
+            %if params.numSteps>2;
+            %    sndIdx = randi([1,params.numSteps/2]) + (rew_side-1)*params.numSteps/2;
+            %else
+            %    sndIdx = rew_side;
+            %end
 
-            if params.numSteps>2;
-                sndIdx = randi([1,params.numSteps/2]) + (rew_side-1)*params.numSteps/2;
-            else
-                sndIdx = rew_side;
-            end
-
-            [snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params);
-
+            %[snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params);
+            
             %PLAY SOUND
             PsychPortAudio('FillBuffer', pahandle, snd);
             PsychPortAudio('Start', pahandle);
@@ -157,7 +161,7 @@
             rew_mtx = [1,1];
             fprintf(fileID,strcat('rew:',num2str('RL'),'_',num2str(rewT),'_',num2str(frame_Nr),'\n'));
             outputSingleScan(s,rew_mtx);
-            fprint('reward')
+            fprintf('reward')
             rewT =  toc(tStart);
             rewOn = true;
             rewCnt = rewCnt + 1;
@@ -171,8 +175,8 @@
             rewOn = false;
        end
        
-       if (toc(tStart)-screenUpDateT)>2
-           fprint('\n');
+       if (toc(tStart)-screenUpdateT)>2
+           fprintf('\n');
        end
 
     end
