@@ -112,18 +112,35 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     
     
     %% lick detection and processing
+    %% lick detection and processing
     input = inputSingleScan(s);
     frame_Nr = input(3);
     %Here side is R or L when lick_side is 1 or 2, respectively
     [licked, side, lick_side, prevL] = proc_lick_2AFC(input,tStart, prevL);
     
-    
     %update text file with lick times
-    if side~=99
-        fprintf(fileID,strcat('lick:',num2str(side),'_',num2str(toc(tStart)),'_',num2str(frame_Nr),'\n'));
+    if any(lick_side==[1,2])
+        fprintf(fileID,strcat('lick:',num2str(side),'_', ... 
+                              num2str(toc(tStart)),'_', ...
+                              num2str(frame_Nr),'\n'));
+    end
+    
+    %deliver free reward on one side and print that you have done so in
+    %text file
+    if any(lick_side==[3,4])
+        rew_mtx(lick_side-2) = 1;
+        outputSingleScan(s,rew_mtx);
+        rewT =  toc(tStart);
+        rewOn = true;
+        rewCnt = rewCnt + 1;
+        
+        fprintf(fileID,strcat('freeRew:',num2str(lick_side),'_',...
+                               num2str(toc(tStart)),'_',...
+                               num2str(frame_Nr),'\n'));
     end
     
     
+    %%
     %Block of Code to get and play new stimulus
     if (toc(tStart) - sndT) >= curr_ISI
         rew_side = randi([1,2]);
@@ -153,7 +170,7 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
         resp = false;
         free = true;
     end
-    
+    %% Free Reward Delivery
     %if free reward is to be delivered (ie. if the mouse responded
     %incorrectly or not at all)
     if free==true
@@ -169,7 +186,7 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
         end
     end
     
-    
+    %% Response ckecing
     %If the mouse licks either right or left
     if (side=='R' || side=='L')
         'responded'

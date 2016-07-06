@@ -1,4 +1,4 @@
-function [licked, side, lick_side, prevL] = proc_lick_2AFC(lick_input,startTimer, prevL)
+function [licked, side, lick_side, prevL] = proc_lick_2AFC_legacy(lick_input,startTimer, prevL)
 licked = false;
 side = 99;
 lick_side = 99;
@@ -6,7 +6,7 @@ if lick_input(1)==0
     
     if (toc(startTimer) - prevL)>0.02
         lickT = toc(startTimer);
-        fprintf('R_%.2f\n',round(toc(startTimer),2))
+        fprintf('R_%.2f',round(toc(startTimer),2))
         side = 'R';
         lick_side = 1;
         licked = true;
@@ -19,7 +19,7 @@ elseif lick_input(2)==0
     
     if (toc(startTimer) - prevL)>0.02
         lickT = toc(startTimer);
-        fprintf('L_%.2f\n',round(toc(startTimer),2))
+        fprintf('L_%.2f',round(toc(startTimer),2))
         side = 'L';
         lick_side = 2;
         licked = true;

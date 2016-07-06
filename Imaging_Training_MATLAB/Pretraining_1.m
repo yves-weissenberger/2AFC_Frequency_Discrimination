@@ -14,7 +14,7 @@ params = struct(...
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
     'rewDur',0.08,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
-    'ISI__short_MEAN',3,...        %inter stimulus interval
+    'ISI_short_MEAN',4,...        %inter stimulus interval
     'ISI_STD',1,...
     'ISI_long_MEAN',8,...        %inter stimulus interval
     'maxDur',2700, ...          %maximum time of experiment in seconds
@@ -36,7 +36,7 @@ base = [folder 'Data' filesep];
 fTime = datestr(datetime('now','TimeZone','local'),'yyyymmdd-HHMMSS');
 subj = input('Type subject name: ','s');
 
-fName = ['2AFC_' subj '_' fTime '_data.txt'];
+fName = ['Pretaining1_' subj '_' fTime '_data.txt'];
 file_loc = strcat(base,fName);
 fileID = fopen(file_loc,'at+');
 
@@ -50,7 +50,7 @@ device = daq.getDevices;
 dev =  device(1);
 
 
-addDigitalChannel(s,dev.ID, 'Port0/Line0:1', 'InputOnly');
+addDigitalChannel(s,dev.ID, 'Port0/Line0:3', 'InputOnly');
 
 %Setup digital outputs
 addDigitalChannel(s,dev.ID,'Port1/Line2:3','OutputOnly')
@@ -60,6 +60,7 @@ outputSingleScan(s,[0,0])
 
 % P2.7 can be configured as a counter; that is pin 9
 addCounterInputChannel(s,dev.ID,0,'EdgeCount');
+
 
 
 
@@ -88,7 +89,7 @@ end
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%         Run Script         %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%         Run Script         %%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -108,13 +109,13 @@ licked = false;
 side = 99;
 hasplayed = false;
 %intialise ITI
-collected = [0,0];
+collected = [0,0]; rew_mtx = [0,0];
 
 curr_ISI = abs(normrnd(params.ISI_short_MEAN,params.ISI_STD)) + 2;
 
 %in this case, the stimulus is a click
-clickL = 5; %clicklength in samples
-click =  cat(2,zeros(1,500),ones(1,clickL),-ones(1,clickL),zeros(1,500));
+clickL = 50; %clicklength in samples
+click =  cat(2,zeros(1,500),ones(1,clickL),- ones(1,clickL),zeros(1,500));
 while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     
     
@@ -124,12 +125,26 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     %Here side is R or L when lick_side is 1 or 2, respectively
     [licked, side, lick_side, prevL] = proc_lick_2AFC(input,tStart, prevL);
     
-    
     %update text file with lick times
-    if side~=99
-        fprintf(fileID,strcat('lick:',num2str(side),'_',num2str(toc(tStart)),'_',num2str(frame_Nr),'\n'));
+    if any(lick_side==[1,2])
+        fprintf(fileID,strcat('lick:',num2str(side),'_', ... 
+                              num2str(toc(tStart)),'_', ...
+                              num2str(frame_Nr),'\n'));
     end
     
+    %deliver free reward on one side and print that you have done so in
+    %text file
+    if any(lick_side==[3,4])
+        rew_mtx(lick_side-2) = 1;
+        outputSingleScan(s,rew_mtx);
+        rewT =  toc(tStart);
+        rewOn = true;
+        rewCnt = rewCnt + 1;
+        
+        fprintf(fileID,strcat('freeRew:',num2str(lick_side),'_',...
+                               num2str(toc(tStart)),'_',...
+                               num2str(frame_Nr),'\n'));
+    end
     
     %Block of Code to get and play new stimulus
     if ((toc(tStart) - sndT) >= curr_ISI)
@@ -157,13 +172,19 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     
     if (((toc(tStart)-sndT)>params.sndRewIntv) && hasplayed==true)
         rew_mtx = [1,1];
-        fprintf(fileID,strcat('rew:',num2str('RL'),'_',num2str(rewT),'_',num2str(frame_Nr),'\n'));
+        fprintf(fileID, ...
+                strcat('rew:',num2str('RL'),'_', ...
+                num2str(toc(tStart)),'_', ... 
+                num2str(frame_Nr),'\n'));
+
         outputSingleScan(s,rew_mtx);
         fprintf('reward ')
         rewT =  toc(tStart);
         rewOn = true;
-        rewCnt = rewCnt + 1;
+        rewCnt = rewCnt + 2;
         hasplayed = false;
+        collected = [0,0];
+        
         
     end
     
@@ -171,15 +192,16 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     %STOP REWARD DELIVERY
     if ( (toc(tStart)-rewT )>params.rewDur && rewOn )
         outputSingleScan(s,[0,0]) %close solenoids
+        rew_mtx = [0,0];
         rewOn = false;
     end
     
-    if (toc(tStart)-screenUpdateT)>5
+    if (toc(tStart)-screenUpdateT)>2
         fprintf('\n');
         screenUpdateT = toc(tStart);
     end
     
-    if (hasplayed==false && side~=99)
+    if (hasplayed==false && lick_side~=99)
         collected(lick_side) = 1;
     end
     

@@ -1,4 +1,4 @@
-function wave =gensin(freq, duration,sampleRate,edge_window)
+function wave =gensin_legacy(freq, duration,sampleRate,edge_window)
 % gensin generates smoothed sinwaves
 %   wave = gensin(k) generates a 1s, kHz, sinusoid 
 %   with rate of 195312Hz (TDT-default) and 10ms
