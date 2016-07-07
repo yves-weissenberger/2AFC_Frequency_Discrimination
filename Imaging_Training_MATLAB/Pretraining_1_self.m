@@ -36,7 +36,7 @@ base = [folder 'Data' filesep];
 fTime = datestr(datetime('now','TimeZone','local'),'yyyymmdd-HHMMSS');
 subj = input('Type subject name: ','s');
 
-fName = ['Pretaining1_' subj '_' fTime '_data.txt'];
+fName = ['Pretaining1_self_' subj '_' fTime '_data.txt'];
 file_loc = strcat(base,fName);
 fileID = fopen(file_loc,'at+');
 %save(strcat(file_loc,'struct'), params)
@@ -89,7 +89,9 @@ end
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%         Run Script         %%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%         Run Script
+%%%%%%%%%%%%%%%%%%%%%%         %%%%%%%%%%%%%%%%%%%%%%%%%20161707
+Alberto_
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -104,7 +106,7 @@ RlickCtr = 0; LlickCtr = 0; rewCnt = 0;
 %initliase others
 rewOn = false;
 prevSnd = 0;
-resp = true;
+hasLicked = true;
 licked = false;
 side = 99;
 hasplayed = false;
@@ -116,6 +118,7 @@ curr_ISI = abs(normrnd(params.ISI_short_MEAN,params.ISI_STD)) + 2;
 %in this case, the stimulus is a click
 clickL = 50; %clicklength in samples
 click =  cat(2,zeros(1,500),ones(1,clickL),- ones(1,clickL),zeros(1,500));
+
 while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     
     
@@ -166,11 +169,11 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
             num2str(frame_Nr),'\n'));
         
         %flag specifying whether the animals has responded until now
-        resp = false;
+        hasLicked = false;
         hasplayed = true;
     end
     
-    if (((toc(tStart)-sndT)>params.sndRewIntv) && hasplayed==true)
+    if (((toc(tStart)-sndT)>params.sndRewIntv) && hasplayed==true && hasLicked==true)
         rew_mtx = [1,1];
         fprintf(fileID, ...
                 strcat('rew:',num2str('RL'),'_', ...
@@ -200,9 +203,13 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
         fprintf('\n');
         screenUpdateT = toc(tStart);
     end
+    if (hasplayed==true && any(lick_side==[1,2]) && (toc(tStart)-sndT )>2)
+        hasLicked = true;
+    end
     
-    if (hasplayed==false && lick_side~=99)
+    if (hasplayed==false && any(lick_side==[1,2]))
         collected(lick_side) = 1;
+        
     end
     
     if sum(collected)==2
