@@ -12,7 +12,7 @@ params = struct(...
     'numSteps',3, ...
     'sampleRate',192000, ...   %audio sample rate in Hz
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
-    'rewDur',0.08,...         %solenoid opening duration in seconds
+    'rewDur',0.06,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
     'ISI_short_MEAN',8,...        %inter stimulus interval
     'ISI_STD',1,...
@@ -91,7 +91,6 @@ end
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%         Run Script
 %%%%%%%%%%%%%%%%%%%%%%         %%%%%%%%%%%%%%%%%%%%%%%%%20161707
-Alberto_
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -173,7 +172,7 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
         hasplayed = true;
     end
     
-    if (((toc(tStart)-sndT)>params.sndRewIntv) && hasplayed==true && hasLicked==true)
+    if ( hasplayed==true && hasLicked==true)
         rew_mtx = [1,1];
         fprintf(fileID, ...
                 strcat('rew:',num2str('RL'),'_', ...
@@ -203,11 +202,11 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
         fprintf('\n');
         screenUpdateT = toc(tStart);
     end
-    if (hasplayed==true && any(lick_side==[1,2]))
+    if (hasplayed==true && any(lick_side==[1,2]) && (toc(tStart)-sndT )<2)
         hasLicked = true;
     end
+    
     if (hasplayed==false && any(lick_side==[1,2]))
-        hasLicked = true;
         collected(lick_side) = 1;
         
     end

@@ -14,9 +14,9 @@ params = struct(...
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
     'rewDur',0.06,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
-    'ISI_short_MEAN',14,...        %inter stimulus interval
+    'ISI_short_MEAN',8,...        %inter stimulus interval
     'ISI_STD',1,...
-    'ISI_long_MEAN',16,...        %inter stimulus interval
+    'ISI_long_MEAN',12,...        %inter stimulus interval
     'maxDur',2700, ...          %maximum time of experiment in seconds
     'sndRewIntv',0.7 ...
     );
@@ -172,7 +172,7 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
         hasplayed = true;
     end
     
-    if (hasplayed==true && hasLicked==true)
+    if ((((toc(tStart)-sndT)>params.sndRewIntv)||hasLicked==true) && hasplayed==true)
         rew_mtx = [1,1];
         fprintf(fileID, ...
                 strcat('rew:',num2str('RL'),'_', ...
