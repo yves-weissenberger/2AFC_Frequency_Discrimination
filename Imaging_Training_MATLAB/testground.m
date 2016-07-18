@@ -4,7 +4,7 @@ n = 5000;
 idx =1;
 a = zeros(1,n);
 for i=1:n
-    [snd, vol, frq] =  get_stim(idx,frqs,centreFreq,params);
+    [snd, vol, frq] =  get_stim(idx,frqs,centreFreq,params,false);
     frq;
     a(i) = frq;
 end

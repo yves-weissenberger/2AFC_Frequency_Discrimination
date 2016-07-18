@@ -149,7 +149,7 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
         end
         
         'in'
-        [snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params);
+        [snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params,false);
         'out'
         %PLAY SOUND
         PsychPortAudio('FillBuffer', pahandle, snd);

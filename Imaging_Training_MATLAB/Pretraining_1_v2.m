@@ -39,7 +39,8 @@ subj = input('Type subject name: ','s');
 fName = ['Pretaining1_self_' subj '_' fTime '_data.txt'];
 file_loc = strcat(base,fName);
 fileID = fopen(file_loc,'at+');
-%save(strcat(file_loc,'struct'), params)
+paramfName = ['Pretaining1_self_' subj '_' fTime '_parameters'];
+save(strcat(base,paramfName), 'params')
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%       Setup NI-board        %%%%%%%%%%%%%%%%%%%%%%%%%

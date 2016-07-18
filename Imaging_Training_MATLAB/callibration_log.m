@@ -7,7 +7,7 @@ longsweep_2_32_03 = [75.6,76.4,73.9,75.0,76.2,73.3,73.9,74.7,72.2,72.9,73.7,73.2
                      61.3,60.9,60.3,60.7,59.9,60.1,60.0,59.7,60.3,59.4,59.2,58.5,58.7,59.1,57.9,57.9,57.5, ...
                      57.1,58.0,56.2,55.6,54.9,54.8,56.0,54.0,53.0,54.2,50.0,54.2,49.4,48.6];
                  
-n = 80
+n = 80;
                  
 longsweep_2_32_03 = longsweep_2_32_03(1:n);
 frqs = logspace(log10(2000),log10(32000),100);
@@ -100,6 +100,16 @@ plot(levels,levels_32kHz_deltaLevel,'o-')
 hold off
 
 
+figure()
+
+hold on
+plot(levels,levels_8kHz_deltaLevel/max(levels_8kHz_deltaLevel),'o-')
+plot(levels,levels_16kHz_deltaLevel/max(levels_16kHz_deltaLevel),'o-')
+plot(levels,levels_32kHz_deltaLevel/max(levels_32kHz_deltaLevel),'o-')
+
+hold off
+
+
 %So this implies that there is an exponential relationship between "gain
 %factor" and level. Different frequencies will offset by different amounts
 %so then I guess the equation should look something like. Ok this is
@@ -113,11 +123,13 @@ hold off
 
 gainData = level_Mtx_deltaLevel + repmat(level_Mtx_deltaLevel(1,1) - level_Mtx_deltaLevel(:,1),1,10);
 
-x = reshape(repmat(levels,3,1),1,30)
+x = reshape(repmat(levels,3,1),1,30);
 y = reshape(gainData,1,30);
 
 hold on                        
 plot((level_Mtx_deltaLevel + repmat(level_Mtx_deltaLevel(1,1) - level_Mtx_deltaLevel(:,1),1,10))','o-')
+
+
 %%
 f = fit(x',y','power2'); 
 plot(f,x,y);
@@ -189,17 +201,25 @@ plot(x,funa(out,x))
 %%
 figure()
 hold on
-plot(ones(4),levels_8kHz_deltaLevel/max(levels_8kHz_deltaLevel),'o')
-plot(ones(4)*2,levels_12kHz_deltaLevel/max(levels_12kHz_deltaLevel),'o')
-plot(ones(4)*3,levels_16kHz_deltaLevel/max(levels_16kHz_deltaLevel),'o')
-plot(ones(4)*4,levels_32kHz_deltaLevel/max(levels_32kHz_deltaLevel),'o')
+plot(ones(10,1),levels_8kHz_deltaLevel/max(levels_8kHz_deltaLevel),'o')
+plot(ones(10,1)*2,levels_12kHz_deltaLevel/max(levels_12kHz_deltaLevel),'o')
+plot(ones(10,1)*3,levels_16kHz_deltaLevel/max(levels_16kHz_deltaLevel),'o')
+plot(ones(10,1)*4,levels_32kHz_deltaLevel/max(levels_32kHz_deltaLevel),'o')
 
 xlim([0,6])
 
 
+%%
 
 
+figure()
+hold on
+plot(ones(4),levels_8kHz_deltaLevel,'o')
+plot(ones(4)*2,levels_12kHz_deltaLevel,'o')
+plot(ones(4)*3,levels_16kHz_deltaLevel,'o')
+plot(ones(4)*4,levels_32kHz_deltaLevel,'o')
 
+xlim([0,6])
 
 
 
@@ -242,11 +262,22 @@ for level = levels
     
     
 end
-%%
+%% This is final code to do the callibration
+% We can extract the offset from the polynomial fit to the data. And, given
+% some offset, extract the gain that will give us the correct level, within
+% bounds. Thus first, we need to work out what the upper and lower bound
+% for level changes are. The lower bound is not too much of a problem, but
+% the lowest level is the key question.
+% Q1: What is the maximum level at the frequency with the lowest 'base'
+% level?
+%         A1: part1: From looking at the data, it seems it is 2x the lowest
+%         level
+%             part2:     
+% Q2: How do we get a stimulus at the given level
+%% Ok solution is just to do a fucking look up table. Can't be bothered...
 
 measured_levels = [
-                    
-                    ]
+                    ];
 
 
 
