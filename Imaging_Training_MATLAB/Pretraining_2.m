@@ -1,27 +1,31 @@
 clear all; close all; clear all hidden;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%       Define parameters       %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 params = struct(...
     'sndDur', 0.2, ...         %length of sounds in s
     'numOct', 1.5, ...           %range of sounds in Octaves
-    'minfreq',8000, ...        %min sound frequency in Hz
-    'maxfreq',8000*(2^1.5), ...        %max sound frequency in Hz
+    'minfreq',8000*(2^-.75), ...        %min sound frequency in Hz
+    'maxfreq',8000*(2^.75), ...        %max sound frequency in Hz
     'numSteps',2, ...
     'sampleRate',192000, ...   %audio sample rate in Hz
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
     'rewDur',0.08,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
-    'ISI_MEAN',3,...        %inter stimulus interval
+    'ISI_S',6,...        %inter stimulus interval
+    'ISI_L',12,...
     'ISI_STD',2,...
     'maxDur',2700, ...          %maximum time of experiment in seconds
-    'sndRewIntv',0.7 ...
+    'sndRewIntv',0.7, ...
+    'errorCorr',true ...
     );
 
 
-
+global callibration_functions
+calStr = load('C:\Users\win-ajk009-admin\Documents\Behaviour_Scripts\Two_AFC\Imaging_Training_MATLAB\callibration_functions.mat');
+callibration_functions = calStr.callibration_functions;
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%    Define File Location    %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,6 +41,7 @@ subj = input('Type subject name: ','s');
 
 fName = ['Pretaining2_' subj '_' fTime '_data.txt'];
 file_loc = strcat(base,fName);
+paramfName = ['Pretaining2_' subj '_' fTime '_parameters'];
 fileID = fopen(file_loc,'at+');
 
 
@@ -70,11 +75,9 @@ InitializePsychSound(1);
 pahandle = PsychPortAudio('Open', [], 1, [], params.sampleRate, 1, [], 0.015);
 
 global frqs
-
-
 f_span = logspace(log10(params.minfreq),log10(params.maxfreq),3);
 centreFreq = f_span(2);
-frqs = [8000,8000*2^1.5];
+frqs = [params.minfreq,params.maxfreq];
 
 
 
@@ -99,11 +102,11 @@ resp = true;
 licked = false;
 free = false;
 side = 99;
-
+corr = true;
 rew_mtx = [0,0];
 
 %intialise ITI
-curr_ISI = abs(normrnd(params.ISI_MEAN,params.ISI_STD)) + 2;
+curr_ISI = abs(normrnd(params.ISI_S-2,params.ISI_STD)) + 2;
 
 while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
     
@@ -139,8 +142,13 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
     %%
     %Block of Code to get and play new stimulus
     if (toc(tStart) - sndT) >= curr_ISI
-        rew_side = randi([1,2]);
-        
+        if params.errorCorr
+            if corr
+                rew_side = randi([1,2]);
+            end
+        else
+            rew_side = randi([1,2]);
+        end
         
         if params.numSteps>2;
             sndIdx = randi([1,params.numSteps/2]) + (rew_side-1)*params.numSteps/2;
@@ -148,9 +156,8 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
             sndIdx = rew_side;
         end
         
-        'in'
-        [snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params,false);
-        'out'
+        [snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params,callibration_functions,false);
+
         %PLAY SOUND
         PsychPortAudio('FillBuffer', pahandle, snd);
         PsychPortAudio('Start', pahandle);
@@ -166,6 +173,7 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
         %flag specifying whether the animals has responded until now
         resp = false;
         free = true;
+        corr = false;
     end
     %% Free Reward Delivery
     %if free reward is to be delivered (ie. if the mouse responded
@@ -175,8 +183,15 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
         if (toc(tStart)-sndT)>params.sndRewIntv
             rew_mtx = [0,0];
             rew_mtx(rew_side) = 1;  %set side to deliver reward on
+            rew_mtx
             outputSingleScan(s,rew_mtx); %deliver reward
             rewT =  toc(tStart); %update timer
+            if resp==false
+                curr_ISI = abs(normrnd(params.ISI_S-2,params.ISI_STD)) + 2;
+            else
+                curr_ISI = abs(normrnd(params.ISI_L-2,params.ISI_STD)) + 2;
+            end
+
             rewOn = true; %set reward to being delivered
             rewCnt = rewCnt+1; %increment reward counter
             fprintf(fileID,strcat('rew:',num2str(rew_side),'_',num2str(rewT),'_',num2str(frame_Nr),'\n')); %print rew to file
@@ -200,10 +215,11 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
                 rewT =  toc(tStart);
                 rewOn = true;
                 rewCnt = rewCnt+1;
-                
+                corr = true;
                 % write the file
                 fprintf(fileID,strcat('rew:',num2str(rew_side),'_',num2str(rewT),'_',num2str(frame_Nr),'\n'));
-                free = false; %set flag for free reward to false                
+                free = false; %set flag for free reward to false
+                curr_ISI = abs(normrnd(params.ISI_S-2,params.ISI_STD)) + 2;
             end
             resp=true; %signal that the mouse has responded
         end
