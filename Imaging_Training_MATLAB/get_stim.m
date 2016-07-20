@@ -1,7 +1,7 @@
-function [snd, volm, frq] = get_stim(idx,frqs,centreFreq,params,callibration_functions,complex)
+function [snd, volm, frq] = get_stim(idx,frqs,centreFreq,params,callibration_functions,stimType)
 
 
-if complex==true
+if strcmp(stimType,'fullDist')
     volm = randi([40,140]);
     boundary = centreFreq;
     
@@ -32,7 +32,7 @@ if complex==true
     
     snd =  gensin(frq,params.sndDur,params.sampleRate,params.edgeWin);
     
-else
+elseif strcmp(stimType,'ThreeByThree')
     %Here just select one of three stimuli for the task
     frqs_dist = [frqs(idx)*2.^(-1/4),frqs(idx),frqs(idx)*2.^(1/4)];
     
@@ -50,10 +50,10 @@ else
     vols = [63,60,57,70,73,76];
     vol_idx = randi(6);
 
-    volm = vols(vol_idx)
+    volm = vols(vol_idx);
     x_test = logspace(log10(1e-3),log10(0.11481),5000);
     
-    frq = callibration_functions{sndIdx,1}
+    frq = callibration_functions{sndIdx,1};
     coeffs = callibration_functions{sndIdx,2};
     f_handle = @(x) coeffs(1).*x.^coeffs(2)+coeffs(3) - volm;
     
@@ -63,6 +63,12 @@ else
     
     snd = snd_wave.*exponent;
     
+    
+elseif strcmp(stimType,'FRA')
+        
+     snd_wave =  gensin(frqs_dist(stim_idx),params.sndDur,params.sampleRate,params.edgeWin);
+     vols = [63,60,57,70,73,76];
+
 end
 
 end

@@ -14,8 +14,8 @@ params = struct(...
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
     'rewDur',0.08,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
-    'ISI_S',8,...        %inter stimulus interval
-    'ISI_L',16,...
+    'ISI_S',600,...        %inter stimulus interval
+    'ISI_L',1200,...
     'ISI_STD',2,...
     'maxDur',2700, ...          %maximum time of experiment in seconds
     'sndRewIntv',1., ...
@@ -119,12 +119,7 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
     
     %update text file with lick times
     if any(lick_side==[1,2])
-        if lick_side==1
-            lick_side_str = 'R'
-        elseif lick_side==2
-            lick_side_str = 'L'
-        end
-        fprintf(fileID,strcat('lick:',lick_side_str,'_', ...
+        fprintf(fileID,strcat('lick:',num2str(side),'_', ...
             num2str(toc(tStart)),'_', ...
             num2str(frame_Nr),'\n'));
     end
@@ -132,7 +127,6 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
     %deliver free reward on one side and print that you have done so in
     %text file
     if any(lick_side==[3,4])
-        rew_mtx = [0,0];
         rew_mtx(lick_side-2) = 1;
         outputSingleScan(s,rew_mtx);
         rewT =  toc(tStart);
@@ -165,7 +159,7 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
             sndIdx = rew_side;
         end
         
-        [snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params,callibration_functions,'ThreeByThree');
+        [snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params,callibration_functions,false);
         
         %PLAY SOUND
         PsychPortAudio('FillBuffer', pahandle, snd);

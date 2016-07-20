@@ -28,9 +28,9 @@ elseif lick_input(2)==0
     
 elseif lick_input(3)==0
     
-     if (toc(startTimer) - prevL)>0.02
+     if (toc(startTimer) - prevL)>.5
         lickT = toc(startTimer);
-        fprintf('freeL_%.2f',round(toc(startTimer),2))
+        fprintf('freeR_%.2f',round(toc(startTimer),2))
         side = 'freeL';
         lick_side = 3;
         licked = false;
@@ -39,9 +39,9 @@ elseif lick_input(3)==0
 
 elseif lick_input(4)==0
     
-     if (toc(startTimer) - prevL)>0.02
+     if (toc(startTimer) - prevL)>.5
         lickT = toc(startTimer);
-        fprintf('freeR_%.2f',round(toc(startTimer),2))
+        fprintf('freeL_%.2f',round(toc(startTimer),2))
         side = 'freeR';
         lick_side = 4;
         licked = false;

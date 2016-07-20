@@ -43,13 +43,14 @@ var(arr)
     % P2.7 can be configured as a counter; that is pin 9
     addCounterInputChannel(s,dev.ID,0,'EdgeCount');
 
-
+%%
 tStart = tic;
 prevL = toc(tStart);
 
 while true
     %% lick detection and processing
     input = inputSingleScan(s);
+    input
     frame_Nr = input(3);
     %Here side is R or L when lick_side is 1 or 2, respectively
     [licked, side, lick_side, prevL] = proc_lick_2AFC(input,tStart, prevL);

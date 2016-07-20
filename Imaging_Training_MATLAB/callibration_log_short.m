@@ -42,7 +42,7 @@ end
 
 %%
 
-exponents = logspace(log10(1e-3),log10(.4),25);
+exponents = logspace(log10(1e-3),log10(.4),10);
 
 
 centreFreq = frqs(1);
@@ -242,6 +242,7 @@ for i=1:6
     plot(exponents,x,'o')
     x_test = logspace(log10(1e-3),log10(0.11481),200);
     plot(x_test,fit_F(x_test),'.')
+    grid()
 end
 
 
