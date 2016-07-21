@@ -56,7 +56,7 @@ elseif strcmp(stimType,'ThreeByThree')
     frq = callibration_functions{sndIdx,1};
     coeffs = callibration_functions{sndIdx,2};
     f_handle = @(x) coeffs(1).*x.^coeffs(2)+coeffs(3) - volm;
-    
+    fprintf('__frq:_%.2f V:_%.2f__',round(frq),volm)
     samples = f_handle(x_test);
     [~,idx] = min(abs(samples));
     exponent = x_test(idx);

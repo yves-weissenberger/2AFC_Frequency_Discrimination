@@ -1,5 +1,6 @@
 clear all; close all; clear all hidden;
 
+
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%       Define parameters       %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -14,12 +15,13 @@ params = struct(...
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
     'rewDur',0.08,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
-    'ISI_S',8,...        %inter stimulus interval
-    'ISI_L',16,...
-    'ISI_STD',2,...
+    'ISI_S',6,...        %inter stimulus interval
+    'ISI_L',12,...
+    'ISI_STD',1,...
     'maxDur',2700, ...          %maximum time of experiment in seconds
     'sndRewIntv',1., ...
-    'errorCorr',true ...
+    'errorCorr',true, ...
+    'maxNerrorCorr',3 ...
     );
 
 
@@ -104,7 +106,7 @@ free = false;
 side = 99;
 corr = true;
 rew_mtx = [0,0];
-
+nErrorCorr = 0;
 %intialise ITI
 curr_ISI = abs(normrnd(params.ISI_S-2,params.ISI_STD)) + 2;
 
@@ -120,9 +122,9 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
     %update text file with lick times
     if any(lick_side==[1,2])
         if lick_side==1
-            lick_side_str = 'R'
+            lick_side_str = 'R';
         elseif lick_side==2
-            lick_side_str = 'L'
+            lick_side_str = 'L';
         end
         fprintf(fileID,strcat('lick:',lick_side_str,'_', ...
             num2str(toc(tStart)),'_', ...
@@ -152,8 +154,11 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
     %% Block of Code to get and play new stimulus ie start trial
     if (toc(tStart) - sndT) >= curr_ISI
         if params.errorCorr
-            if corr
+            if (corr || nErrorCorr>= params.maxNerrorCorr)
                 rew_side = randi([1,2]);
+                nErrorCorr = 0;
+            else
+               nErrorCorr = nErrorCorr + 1;
             end
         else
             rew_side = randi([1,2]);
@@ -256,6 +261,7 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
                 fprintf(fileID,strcat('rew:',rew_sideStr,'_',num2str(rewT),'_',num2str(frame_Nr),'\n'));
                 free = false; %set flag for free reward to false
                 curr_ISI = abs(normrnd(params.ISI_S-2,params.ISI_STD)) + 2;
+                nErrorCorr = 0;
             end
             resp=true; %signal that the mouse has responded
         end
@@ -279,7 +285,7 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
     
 end
 %%
-'end'
+fprint('end')
 outputSingleScan(s,[0,0])
 PsychPortAudio('Close');
 
