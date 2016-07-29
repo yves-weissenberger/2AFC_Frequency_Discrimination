@@ -6,7 +6,7 @@ clear all; close all; clear all hidden;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 params = struct(...
-    'sndDur', 0.2, ...         %length of sounds in s
+    'sndDur', .2, ...         %length of sounds in s
     'numOct', 1.5, ...           %range of sounds in Octaves
     'minfreq',8000*(2^-.75), ...        %min sound frequency in Hz
     'maxfreq',8000*(2^.75), ...        %max sound frequency in Hz
@@ -45,6 +45,8 @@ fName = ['Pretaining2_' subj '_' fTime '_data.txt'];
 file_loc = strcat(base,fName);
 paramfName = ['Pretaining2_' subj '_' fTime '_parameters'];
 fileID = fopen(file_loc,'at+');
+
+save(strcat(base,paramfName), 'params')
 
 
 
@@ -115,7 +117,7 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
     
     %% lick detection and processing
     input = inputSingleScan(s);
-    frame_Nr = input(3);
+    frame_Nr = input(5);
     %Here side is R or L when lick_side is 1 or 2, respectively
     [licked, side, lick_side, prevL] = proc_lick_2AFC(input,tStart, prevL);
     
@@ -209,7 +211,7 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
             outputSingleScan(s,rew_mtx); %deliver reward
             rewT =  toc(tStart); %update timer
             if resp==false
-                curr_ISI = abs(normrnd(params.ISI_S-2,params.ISI_STD)) + 2;
+                curr_ISI = abs(normrnd(params.ISI_S,params.ISI_STD)) + 2;
             else
                 curr_ISI = abs(normrnd(params.ISI_L-2,params.ISI_STD)) + 2;
             end
@@ -284,6 +286,9 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
     
     
 end
+    snd = gensin(frq,6,params.sampleRate,params.edgeWin);
+    PsychPortAudio('FillBuffer', pahandle, snd*exponent);
+    PsychPortAudio('Start', pahandle);
 %%
 fprint('end')
 outputSingleScan(s,[0,0])

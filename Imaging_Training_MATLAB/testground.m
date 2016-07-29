@@ -50,8 +50,8 @@ prevL = toc(tStart);
 while true
     %% lick detection and processing
     input = inputSingleScan(s);
-    input
-    frame_Nr = input(3);
+    input;
+    frame_Nr = input(5)
     %Here side is R or L when lick_side is 1 or 2, respectively
     [licked, side, lick_side, prevL] = proc_lick_2AFC(input,tStart, prevL);
     

@@ -62,7 +62,7 @@ addCounterInputChannel(s,dev.ID,0,'EdgeCount');
 
 InitializePsychSound(1);
 pahandle = PsychPortAudio('Open', [], 1, [], params.sampleRate, 1, [], 0.015);
-
+%%
 global frqs
 f_span = logspace(log10(params.minfreq),log10(params.maxfreq),3);
 centreFreq = f_span(2);
