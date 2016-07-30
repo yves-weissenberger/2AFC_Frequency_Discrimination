@@ -1,0 +1,3 @@
+20160730
+
+changed spout positions after pretraining1 because of SUPER strong left bias. Improved situation
