@@ -41,9 +41,9 @@ base = [folder 'Data' filesep];
 fTime = datestr(datetime('now','TimeZone','local'),'yyyymmdd-HHMMSS');
 subj = input('Type subject name: ','s');
 
-fName = ['Pretaining2_' subj '_' fTime '_data.txt'];
+fName = ['Pretaining2alt_' subj '_' fTime '_data.txt'];
 file_loc = strcat(base,fName);
-paramfName = ['Pretaining2_' subj '_' fTime '_parameters'];
+paramfName = ['Pretaining2alt_' subj '_' fTime '_parameters'];
 fileID = fopen(file_loc,'at+');
 
 save(strcat(base,paramfName), 'params')
@@ -192,40 +192,7 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
         corr = false;
     end
     
-    %% Free Reward Delivery
-    %if free reward is to be delivered (ie. if the mouse responded
-    %incorrectly or not at all)
-    if free==true
-        %and sndRewInv seconds have passed since the sound was played
-        if (toc(tStart)-sndT)>params.sndRewIntv
-            
-            if rew_side==1
-                rew_sideStr = 'R';
-            elseif rew_side==2
-                rew_sideStr = 'L';
-            end
-            
-            fprintf(strcat('__free_rew__',rew_sideStr))
-            rew_mtx = [0,0];
-            rew_mtx(rew_side) = 1;  %set side to deliver reward on
-            outputSingleScan(s,rew_mtx); %deliver reward
-            rewT =  toc(tStart); %update timer
-            if resp==false
-                curr_ISI = abs(normrnd(params.ISI_S,params.ISI_STD)) + 2;
-            else
-                curr_ISI = abs(normrnd(params.ISI_L-2,params.ISI_STD)) + 2;
-            end
-            
-
-            
-            
-            rewOn = true; %set reward to being delivered
-            rewCnt = rewCnt+1; %increment reward counter
-            fprintf(fileID,strcat('rew:',rew_sideStr,'_',num2str(rewT),'_',num2str(frame_Nr),'\n')); %print rew to file
-            free = false;
-        end
-    end
-    
+   
     %% Response ckecing
     %If the mouse licks either right or left
     if any(lick_side==[1,2])
@@ -270,6 +237,39 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
     end
     
     
+    %% Free Reward Delivery
+    %if free reward is to be delivered (ie. if the mouse responded
+    %incorrectly or not at all)
+    if free==true
+        %and sndRewInv seconds have passed since the sound was played
+        if ((toc(tStart)-sndT)>params.sndRewIntv && lick_side==rew_side)
+            
+            if rew_side==1
+                rew_sideStr = 'R';
+            elseif rew_side==2
+                rew_sideStr = 'L';
+            end
+            
+            fprintf(strcat('__free_rew__',rew_sideStr))
+            rew_mtx = [0,0];
+            rew_mtx(rew_side) = 1;  %set side to deliver reward on
+            outputSingleScan(s,rew_mtx); %deliver reward
+            rewT =  toc(tStart); %update timer
+            if resp==false
+                curr_ISI = abs(normrnd(params.ISI_S,params.ISI_STD)) + 2;
+            else
+                curr_ISI = abs(normrnd(params.ISI_L-2,params.ISI_STD)) + 2;
+            end
+            
+
+            
+            
+            rewOn = true; %set reward to being delivered
+            rewCnt = rewCnt+1; %increment reward counter
+            fprintf(fileID,strcat('rew:',rew_sideStr,'_',num2str(rewT),'_',num2str(frame_Nr),'\n')); %print rew to file
+            free = false;
+        end
+    end
     
     
     %STOP REWARD DELIVERY

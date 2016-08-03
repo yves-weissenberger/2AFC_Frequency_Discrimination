@@ -1,0 +1,2 @@
+Really might need to make version where they need to response lick in order to get the free reward,
+such that it is only set-up after the timeout
