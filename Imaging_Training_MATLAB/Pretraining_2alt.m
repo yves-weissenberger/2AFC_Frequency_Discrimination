@@ -21,7 +21,7 @@ params = struct(...
     'maxDur',2700, ...          %maximum time of experiment in seconds
     'sndRewIntv',1., ...
     'errorCorr',true, ...
-    'maxNerrorCorr',2 ...
+    'maxNerrorCorr',1 ...
     );
 
 
@@ -289,7 +289,8 @@ end
     snd = gensin(frq,6,params.sampleRate,params.edgeWin);
     PsychPortAudio('FillBuffer', pahandle, snd*exponent);
     PsychPortAudio('Start', pahandle);
-%%
+
+    %%
 fprint('end')
 outputSingleScan(s,[0,0])
 PsychPortAudio('Close');
