@@ -1,0 +1,10 @@
+Sound:click_10.0029_110
+rew:RL_10.7071_130
+Sound:click_25.1419_540
+rew:RL_25.8438_560
+Sound:click_38.5865_922
+rew:RL_39.2937_942
+Sound:click_52.0638_1305
+rew:RL_52.7715_1325
+Sound:click_67.7921_1752
+rew:RL_68.496_1772
