@@ -51,16 +51,14 @@ elseif strcmp(stimType,'ThreeByThree')
 
     volm = vols(vol_idx);
     
-    frq = callibration_functions{sndIdx,1};
-    
+
     levels_stim_calibration = [67,68,68,58,59,59];
-    gainF =  sqrt(10^((volm - levels_stim_calibration(sndIdx))/10));
     
+    gainF =  sqrt(10^(volm - levels_stim_calibration(sndIdx)/10));
     
-    fprintf('__frq:_%.2f V:_%.2f__',round(frq),volm)
     exponent = 0.01*gainF;
     
-    snd_container = snd_wave.*exponent;
+    snd_container = snd_wave.*(exponent + gainF);
     
     
 elseif strcmp(stimType,'FRA')
