@@ -15,11 +15,11 @@ params = struct(...
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
     'rewDur',0.08,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
-    'ISI_S',12,...        %inter stimulus interval
+    'ISI_S',10,...        %inter stimulus interval
     'ISI_L',18,...
     'ISI_STD',1,...
     'maxDur',2700, ...          %maximum time of experiment in seconds
-    'sndRewIntv',1., ...
+    'sndRewIntv',.6, ...
     'errorCorr',true, ...
     'maxNerrorCorr',1 ...
     );
@@ -256,7 +256,7 @@ while (toc(tStart)<params.maxDur && rewCnt<params.maxRew)
             outputSingleScan(s,rew_mtx); %deliver reward
             rewT =  toc(tStart); %update timer
             if resp==false
-                curr_ISI = abs(normrnd(params.ISI_S,params.ISI_STD)) + 2;
+                curr_ISI = abs(normrnd(params.ISI_L-2,params.ISI_STD)) + 2;
             else
                 curr_ISI = abs(normrnd(params.ISI_L-2,params.ISI_STD)) + 2;
             end
@@ -290,7 +290,7 @@ end
     PsychPortAudio('FillBuffer', pahandle, snd*exponent);
     PsychPortAudio('Start', pahandle);
 
-    %%
+     %%
 fprint('end')
 outputSingleScan(s,[0,0])
 PsychPortAudio('Close');
