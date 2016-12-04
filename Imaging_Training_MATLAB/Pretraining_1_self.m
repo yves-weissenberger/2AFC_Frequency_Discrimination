@@ -14,9 +14,9 @@ params = struct(...
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
     'rewDur',0.06,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
-    'ISI_short_MEAN',16,...        %inter stimulus interval
+    'ISI_short_MEAN',6,...        %inter stimulus interval
     'ISI_STD',1,...
-    'ISI_long_MEAN',24,...        %inter stimulus interval
+    'ISI_long_MEAN',8,...        %inter stimulus interval
     'maxDur',2700, ...          %maximum time of experiment in seconds
     'sndRewIntv',0.7 ...
     );

@@ -296,4 +296,4 @@ fprint('end')
 outputSingleScan(s,[0,0])
 PsychPortAudio('Close');
 
-%%outputSingleScan(s,[1,1]); pause(10);outputSingleScan(s,[0,0])
+%%outputSingleScan(s,[1,1]); pause(.5);outputSingleScan(s,[0,0])
