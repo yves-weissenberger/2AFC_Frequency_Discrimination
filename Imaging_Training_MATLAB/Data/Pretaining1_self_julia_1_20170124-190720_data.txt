@@ -1,0 +1,11 @@
+Sound:click_8.9489_82
+freeRew:4_15.8237_276
+freeRew:3_16.6912_302
+Sound:click_17.6271_329
+freeRew:3_19.1278_371
+freeRew:4_20.0332_397
+freeRew:4_20.9272_423
+freeRew:3_23.0703_483
+freeRew:4_24.7272_531
+Sound:click_28.8237_647
+Sound:click_37.8387_903

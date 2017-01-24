@@ -46,7 +46,7 @@ elseif strcmp(stimType,'ThreeByThree')
     
     %Correct for volume stuff
     sndIdx = (idx-1)*3 + stim_idx;
-    vols = [63,60,57,70,73,76];
+    vols = [63,60 ,57,70,73,76];
     vol_idx = randi(6);
 
     volm = vols(vol_idx);
