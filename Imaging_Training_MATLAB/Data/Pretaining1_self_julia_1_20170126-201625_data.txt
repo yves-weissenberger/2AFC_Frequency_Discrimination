@@ -1,0 +1,7 @@
+Sound:click_7.5201_0
+freeRew:4_16.3026_104
+freeRew:3_17.6202_142
+Sound:click_17.6812_143
+freeRew:3_21.0205_238
+freeRew:4_22.4987_280
+Sound:click_26.8954_405
