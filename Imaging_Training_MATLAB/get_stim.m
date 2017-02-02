@@ -53,7 +53,7 @@ elseif strcmp(stimType,'ThreeByThree')
     
     frq = callibration_functions{sndIdx,1};
     
-    levels_stim_calibration = [67,68,68,58,59,59];
+    levels_stim_calibration = [57.9,61.9,58.6,58.1,57.2,57.4];
     gainF =  sqrt(10^((volm - levels_stim_calibration(sndIdx))/10));
     
     
