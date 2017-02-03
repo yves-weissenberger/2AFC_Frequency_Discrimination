@@ -55,7 +55,7 @@ save(strcat(base,paramfName), 'params')
 %%%%%%%%%%%%%%%%%%%%%       Setup NI-board        %%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-s = daq.createSession('ni');
+s = daq.createSession('ni');11
 device = daq.getDevices;
 dev =  device(1);
 
