@@ -15,10 +15,10 @@ params = struct(...
     'numSteps',3, ...
     'sampleRate',192000, ...   %audio sample rate in Hz
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
-    'rewDur',0.06,...         %solenoid opening duration in seconds
+    'rewDur',0.08,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
     'ISI_short_MEAN',6,...        %inter stimulus interval
-    'ISI_STD',1,...
+    'ISI_STD',2,...
     'ISI_long_MEAN',8,...        %inter stimulus interval
     'maxDur',2700, ...          %maximum time of experiment in seconds
     'sndRewIntv',0.7 ...
@@ -39,7 +39,7 @@ base = [folder 'Data' filesep];
 fTime = datestr(datetime('now','TimeZone','local'),'yyyymmdd-HHMMSS');
 subj = input('Type subject name: ','s');
 
-fName = ['Pretaining1_self_' subj '_' fTime '_data.txt'];
+fName = ['Pretaining1_self_multilevel' subj '_' fTime '_data.txt'];
 file_loc = strcat(base,fName);
 fileID = fopen(file_loc,'at+');
 %save(strcat(file_loc,'struct'), params)
@@ -77,17 +77,6 @@ pahandle = PsychPortAudio('Open', [], 1, [], params.sampleRate, 1, [], 0.015);
 global frqs sndMat
 
 
-f_span = logspace(log10(params.minfreq),log10(params.maxfreq),params.numSteps);
-centreFreq = f_span(2);
-frqs = [8000,8000*2^1.5];
-i = 1;
-sndMat = cell(1);
-
-%generate sounds
-for frq = frqs
-    sndMat{i} = gensin(frq,params.sndDur,params.sampleRate,params.edgeWin);
-    i = i+1;
-end
 
 
 
@@ -159,17 +148,17 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
         
         %[snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params);
         %The click is callibrated to ~70dB
-        
-        vol = randi(5,1,1);
+        vol = randi(5,1,1) + 2;
         
         snd = click/(2^vol);
+        fprintf(strcat('__',num2str(vol),'__'))
         %PLAY SOUND
         PsychPortAudio('FillBuffer', pahandle, snd);
         PsychPortAudio('Start', pahandle);
         sndT = toc(tStart);
         
         
-        fprintf(fileID,strcat('Sound:','click','_',num2str(vol), ...
+        fprintf(fileID,strcat('Sound:','click','_',num2str(vol),'_', ...
             num2str(sndT),'_', ...
             num2str(frame_Nr),'\n'));
         
