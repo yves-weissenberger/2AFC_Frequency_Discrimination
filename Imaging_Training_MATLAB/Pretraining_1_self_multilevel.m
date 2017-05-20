@@ -7,6 +7,7 @@ clear all; close all; clear all hidden;
 
 
 
+
 params = struct(...
     'sndDur', 0.2, ...         %length of sounds in s
     'numOct', 1.5, ...           %range of sounds in Octaves
@@ -17,9 +18,9 @@ params = struct(...
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
     'rewDur',0.08,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
-    'ISI_short_MEAN',6,...        %inter stimulus interval
+    'ISI_short_MEAN',9,...        %inter stimulus interval
     'ISI_STD',2,...
-    'ISI_long_MEAN',8,...        %inter stimulus interval
+    'ISI_long_MEAN',9,...        %inter stimulus interval
     'maxDur',2700, ...          %maximum time of experiment in seconds
     'sndRewIntv',0.7 ...
     );
