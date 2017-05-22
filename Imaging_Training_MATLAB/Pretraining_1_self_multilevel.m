@@ -149,7 +149,7 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
         
         %[snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params);
         %The click is callibrated to ~70dB
-        vol = randi(5,1,1) + 2;
+        vol = randi(5,1,1) + 3;
         
         snd = click/(2^vol);
         fprintf(strcat('__',num2str(vol),'__'))
@@ -198,7 +198,7 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
         fprintf('\n');
         screenUpdateT = toc(tStart);
     end
-    if (hasplayed==true && any(lick_side==[1,2]) && (toc(tStart)-sndT )<2)
+    if (hasplayed==true && any(lick_side==[1,2]) && (toc(tStart)-sndT )<1)
         hasLicked = true;
     end
     
