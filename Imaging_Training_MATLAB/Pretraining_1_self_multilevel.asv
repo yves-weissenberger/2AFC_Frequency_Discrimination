@@ -160,9 +160,9 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
             
             %[snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params);
             %The click is callibrated to ~70dB
-            vol = randi(4,1,1);
+            vol = randi(8,1,1);
             
-            snd = click/(2^5 * 1.584893^vol);
+            snd = click/(2^5 + 1.584893^vol);
             fprintf(strcat('__',num2str(vol),'__'))
             %PLAY SOUND
             PsychPortAudio('FillBuffer', pahandle, snd);
