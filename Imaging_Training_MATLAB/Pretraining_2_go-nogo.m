@@ -298,7 +298,7 @@ end
     PsychPortAudio('FillBuffer', pahandle, snd*exponent);
     PsychPortAudio('Start', pahandle);
 
-     %%
+%%
 fprint('end')
 outputSingleScan(s,[0,0])
-%PsychPortAudio('Close');
+%PsychPortAudio('Close')%

@@ -1,0 +1,14 @@
+lick:L_0.30697_0
+lick:L_0.35727_0
+lick:L_1.7967_0
+Sound:click_28.436_174
+lick:L_8.4537_175
+rew:RL_8.4711_175
+lick:L_8.5437_178
+lick:L_8.616_180
+Sound:click_218.0254_467
+Sound:click_227.9901_771
+Sound:click_236.986_1045
+Sound:click_247.587_1368
+Sound:click_257.936_1684
+Sound:click_267.0052_1800

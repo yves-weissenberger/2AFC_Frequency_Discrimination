@@ -18,7 +18,7 @@ params = struct(...
     'rewDur',0.06,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
     'ISI_short_MEAN',6,...        %inter stimulus interval
-    'ISI_STD',1,...
+    'ISI_STD',3,...
     'ISI_long_MEAN',8,...        %inter stimulus interval
     'maxDur',2700, ...          %maximum time of experiment in seconds
     'sndRewIntv',0.7 ...
@@ -119,7 +119,7 @@ curr_ISI = abs(normrnd(params.ISI_short_MEAN,params.ISI_STD)) + 2;
 
 %in this case, the stimulus is a click
 clickL = 50; %clicklength in samples
-click =  cat(2,zeros(1,500),ones(1,clickL),- ones(1,clickL),zeros(1,500));
+click =  cat(2,zeros(1,500),ones(1,clickL),- ones(1,clickL),zeros(1,500))/2;
 
 while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     
@@ -160,16 +160,16 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
         %[snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params);
         %The click is callibrated to ~70dB
         
-        vol = randi(5,1,1);
+        %vol = randi(5,1,1);
         
-        snd = click/(2^vol);
+        snd = click;%click/(2^1);
         %PLAY SOUND
         PsychPortAudio('FillBuffer', pahandle, snd);
         PsychPortAudio('Start', pahandle);
         sndT = toc(tStart);
         
         
-        fprintf(fileID,strcat('Sound:','click','_',num2str(vol), ...
+        fprintf(fileID,strcat('Sound:','click','_',num2str(2), ...
             num2str(sndT),'_', ...
             num2str(frame_Nr),'\n'));
         
