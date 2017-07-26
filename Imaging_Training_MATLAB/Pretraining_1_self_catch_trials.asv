@@ -17,7 +17,7 @@ params = struct(...
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
     'rewDur',0.06,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
-    'ISI_short_MEAN',9,...        %inter stimulus interval
+    'ISI_short_MEAN',6,...        %inter stimulus interval
     'ISI_STD',2,...
     'ISI_long_MEAN',8,...        %inter stimulus interval
     'maxDur',2700, ...          %maximum time of experiment in seconds
@@ -121,6 +121,11 @@ curr_ISI = abs(normrnd(params.ISI_short_MEAN,params.ISI_STD)) + 2;
 clickL = 50; %clicklength in samples
 click =  cat(2,zeros(1,500),ones(1,clickL),- ones(1,clickL),zeros(1,500))/2;
 
+trl_idx = 1;
+
+for i=1:50
+trl_order = randi(2,8);
+
 while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     
     
@@ -176,7 +181,7 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
             
             
             fprintf('____stimulus_trial____');
-            fprintf(num2str(toc
+            fprintf(num2str(sndT))
 
             %flag specifying whether the animals has responded until now
             hasLicked = false;
@@ -184,6 +189,7 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
         else
             
             sndT = toc(tStart);
+            fprintf(strcat('__',num2str(sndT)));
             fprintf(fileID,strcat('Sound:','catch_trial','_',num2str(2), ...
                 num2str(toc(tStart)),'_', ...
                 num2str(frame_Nr),'\n'));

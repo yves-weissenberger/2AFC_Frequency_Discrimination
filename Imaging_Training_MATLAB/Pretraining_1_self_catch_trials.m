@@ -2,7 +2,8 @@ clear all; close all; clear all hidden;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%       Define parameters       %%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
 
 
 
@@ -17,7 +18,7 @@ params = struct(...
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
     'rewDur',0.06,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
-    'ISI_short_MEAN',6,...        %inter stimulus interval
+    'ISI_short_MEAN',5,...        %inter stimulus interval
     'ISI_STD',2,...
     'ISI_long_MEAN',8,...        %inter stimulus interval
     'maxDur',2700, ...          %maximum time of experiment in seconds
@@ -121,6 +122,14 @@ curr_ISI = abs(normrnd(params.ISI_short_MEAN,params.ISI_STD)) + 2;
 clickL = 50; %clicklength in samples
 click =  cat(2,zeros(1,500),ones(1,clickL),- ones(1,clickL),zeros(1,500))/2;
 
+trl_idx = 1;
+
+
+trl_order = Shuffle([2,2,2,2,1,1,1,1])';
+
+for i=1:50
+    trl_order = cat(1,trl_order,Shuffle([2,2,2,2,1,1,1,1])');
+end
 while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     
     
@@ -153,7 +162,10 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     
     %Block of Code to get and play new stimulus
     if ((toc(tStart) - sndT) >= curr_ISI)
-        rew_side = randi([1,2]);
+        
+        
+        rew_side = trl_order(trl_idx);
+        trl_idx = trl_idx + 1;
         curr_ISI = abs(normrnd(params.ISI_short_MEAN,params.ISI_STD)) + 3;
         
         if rew_side==1
