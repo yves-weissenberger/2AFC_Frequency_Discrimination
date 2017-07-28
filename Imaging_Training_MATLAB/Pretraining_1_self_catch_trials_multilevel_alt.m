@@ -2,7 +2,8 @@ clear all; close all; clear all hidden;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%       Define parameters       %%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
 
 
 
@@ -17,8 +18,8 @@ params = struct(...
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
     'rewDur',0.06,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
-    'ISI_short_MEAN',6,...        %inter stimulus interval
-    'ISI_STD',1,...
+    'ISI_short_MEAN',5,...        %inter stimulus interval
+    'ISI_STD',2,...
     'ISI_long_MEAN',8,...        %inter stimulus interval
     'maxDur',2700, ...          %maximum time of experiment in seconds
     'sndRewIntv',0.7 ...
@@ -39,7 +40,7 @@ base = [folder 'Data' filesep];
 fTime = datestr(datetime('now','TimeZone','local'),'yyyymmdd-HHMMSS');
 subj = input('Type subject name: ','s');
 
-fName = ['Pretaining1_self_' subj '_' fTime '_data.txt'];
+fName = ['Pretaining1_self_catch_trials_multilevel' subj '_' fTime '_data.txt'];
 file_loc = strcat(base,fName);
 fileID = fopen(file_loc,'at+');
 %save(strcat(file_loc,'struct'), params)
@@ -121,6 +122,17 @@ curr_ISI = abs(normrnd(params.ISI_short_MEAN,params.ISI_STD)) + 2;
 clickL = 50; %clicklength in samples
 click =  cat(2,zeros(1,500),ones(1,clickL),- ones(1,clickL),zeros(1,500))/2;
 
+trl_idx = 1;
+
+
+trl_order = Shuffle([0,2,4,6,8,10,12,14,99,0,2,4,6,8,10,12,14,99])';
+
+%trl_order = Shuffle([0,6,8,8.5,9,9.5,10,11,12,99,0,6,8,8.5,9,9.5,10,11,12,99,])';
+
+for i=1:50
+    trl_order = cat(1,trl_order,Shuffle([0,2,4,6,8,10,12,14,99,0,2,4,6,8,10,12,14,99])');
+    %trl_order = cat(1,trl_order,Shuffle([0,6,8,8.5,9,9.5,10,11,12,99,0,6,8,8.5,9,9.5,10,11,12,99])');
+end
 while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     
     
@@ -153,31 +165,58 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     
     %Block of Code to get and play new stimulus
     if ((toc(tStart) - sndT) >= curr_ISI)
-        rew_side = randi([1,2]);
-        curr_ISI = abs(normrnd(params.ISI_long_MEAN,params.ISI_STD)) + 2;
         
         
-        %[snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params);
-        %The click is callibrated to ~70dB
+        rew_side = trl_order(trl_idx);
+        trl_idx = trl_idx + 1;
+        curr_ISI = abs(normrnd(params.ISI_short_MEAN,params.ISI_STD)) + 3;
         
-        %vol = randi(5,1,1);
+        if rew_side<20
         
-        snd = click%click/(2^1);
-        %PLAY SOUND
-        PsychPortAudio('FillBuffer', pahandle, snd);
-        PsychPortAudio('Start', pahandle);
-        sndT = toc(tStart);
+            %[snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params);
+            %The click is callibrated to ~70dB
+
+            vol = rew_side;
+
+         
+            snd = click/(1.584893^vol);
+
+            fprintf(strcat('__',num2str(vol),'__'))
+            %PLAY SOUND
+            PsychPortAudio('FillBuffer', pahandle, snd);
+            PsychPortAudio('Start', pahandle);
+            sndT = toc(tStart);
+
+
+            fprintf(fileID,strcat('Sound:','click','_',num2str(vol),'_', ...
+                num2str(sndT),'_', ...
+                num2str(frame_Nr),'\n'));
+            
+            
+            fprintf('____stimulus_trial____');
+            fprintf(num2str(sndT))
+
+            %flag specifying whether the animals has responded until now
+            hasLicked = false;
+            hasplayed = true;
+        else
+            
+            sndT = toc(tStart);
+            fprintf(strcat('__',num2str(sndT)));
+            fprintf(fileID,strcat('Sound:','catch_trial','_',num2str(99),'_', ...
+                num2str(toc(tStart)),'_', ...
+                num2str(frame_Nr),'\n'));
+            
+            fprintf('____catch_trial____');
+            hasLicked = true;
+            hasplayed = false;
+        end
         
-        
-        fprintf(fileID,strcat('Sound:','click','_',num2str(), ...
-            num2str(sndT),'_', ...
-            num2str(frame_Nr),'\n'));
-        
-        %flag specifying whether the animals has responded until now
-        hasLicked = false;
-        hasplayed = true;
     end
     
+    
+        
+        
     if (hasplayed==true && hasLicked==true)
         rew_mtx = [1,1];
         fprintf(fileID, ...
@@ -218,7 +257,7 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     end
     
     if sum(collected)==2
-        curr_ISI = abs(normrnd(params.ISI_short_MEAN,params.ISI_STD)) + 2;
+        %curr_ISI = abs(normrnd(params.ISI_short_MEAN,params.ISI_STD)) + 2;
     end
 end
 
