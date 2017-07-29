@@ -1,0 +1,5 @@
+Sound:catch_trial_29.6826_73
+Sound:click_214.8958_210
+Sound:catch_trial_221.7916_391
+freeRew:4_22.2754_404
+freeRew:3_23.1527_427
