@@ -125,14 +125,24 @@ click =  cat(2,zeros(1,500),ones(1,clickL),- ones(1,clickL),zeros(1,500))/2;
 trl_idx = 1;
 
 
-trl_order = Shuffle([0,2,4,6,8,10,12,14,99,0,2,4,6,8,10,12,14,99])';
+stim_order = Shuffle([0,2,4,6,8,10,12,14,99,0,2,4,6,8,10,12,14,99])';
 
 %trl_order = Shuffle([0,6,8,8.5,9,9.5,10,11,12,99,0,6,8,8.5,9,9.5,10,11,12,99,])';
 
 for i=1:50
-    trl_order = cat(1,trl_order,Shuffle([0,2,4,6,8,10,12,14,99,0,2,4,6,8,10,12,14,99])');
+    stim_order = cat(1,trl_order,Shuffle([0,2,4,6,8,10,12,14,99,0,2,4,6,8,10,12,14,99])');
     %trl_order = cat(1,trl_order,Shuffle([0,6,8,8.5,9,9.5,10,11,12,99,0,6,8,8.5,9,9.5,10,11,12,99])');
 end
+
+
+
+trl_order = Shuffle([2,2,2,2,1,1,1,1])';
+
+for i=1:50
+    trl_order = cat(1,trl_order,Shuffle([2,2,2,2,1,1,1,1])');
+end
+
+stim_idx = 1;
 while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     
     
@@ -171,12 +181,13 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
         trl_idx = trl_idx + 1;
         curr_ISI = abs(normrnd(params.ISI_short_MEAN,params.ISI_STD)) + 3;
         
-        if rew_side<20
+        if rew_side==1
         
             %[snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params);
             %The click is callibrated to ~70dB
 
-            vol = rew_side;
+            vol = stim_order(stim_idx);
+            stim_idx = stim_idx + 1;
 
          
             snd = click/(1.584893^vol);

@@ -16,7 +16,7 @@ params = struct(...
     'numSteps',3, ...
     'sampleRate',192000, ...   %audio sample rate in Hz
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
-    'rewDur',0.06,...         %solenoid opening duration in seconds
+    'rewDur',0.03,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
     'ISI_short_MEAN',9,...        %inter stimulus interval
     'ISI_STD',2,...
@@ -127,17 +127,20 @@ trl_idx = 1;
 
 
 %this is early mapping starting levels, to gauge sensitivity
-%trl_order = Shuffle([0,2,4,6,8,10,12,14,99,0,2,4,6,8,10,12,14,99])';
+%trl_order = Shuffle([0,2,4,6,8,10,99,0,2,4,6,8,10,99])';
 
 
-trl_order = cat(1,[0,0,6]',Shuffle([0,6,8,8.5,9,9.5,10,12,99,0,6,8,8.5,9,9.5,10,12,99,])');%diamond
+%trl_order = cat(1,[0,0,6]',Shuffle([0,6,8,8.5,9,9.5,10,12,99,0,6,8,8.5,9,9.5,10,12,99,])');%diamond
+trl_order = cat(1,[0,0,6]',Shuffle([0,6,7,8,8.5,9,9.5,10,10.5,11,99,0,6,7,7.5,8,8.5,9,9.5,10,10.5,11,99,])');%biggie
+
+trl_order = cat(1,[0,0,6]',Shuffle([0,5,6,7,8,9,10,11,99,0,5,6,6.5,7,7.5,8,8.5,9,9.5,10,10.5,11,99,])');%biggie
 
 for i=1:50
-    %trl_order = cat(1,trl_order,Shuffle([0,2,4,6,8,10,12,14,99,0,2,4,6,8,10,12,14,99])');
+    trl_order = cat(1,trl_order,Shuffle([0,2,4,6,8,10,99,0,2,4,6,8,10,99])');
     
     
-    trl_order = cat(1,trl_order,Shuffle([0,6,8,8.5,9,9.5,10,12,99,0,6,8,8.5,9,9.5,10,12,99])');
-    trl_order = cat(1,trl_order,Shuffle([0,6,7,7.5,8,9.5,10,12,99,0,6,8,8.5,9,9.5,10,12,99])');
+    %trl_order = cat(1,trl_order,Shuffle([0,6,8,8.5,9,9.5,10,12,99,0,6,8,8.5,9,9.5,10,12,99])');
+    trl_order = cat(1,trl_order,Shuffle([0,6,7,8,8.5,9,9.5,10,10.5,11,99,0,6,7,7.5,8,8.5,9,9.5,10,10.5,11,99,])');    %%biggie and earlv
 end
 while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     
