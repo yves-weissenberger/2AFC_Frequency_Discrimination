@@ -1,0 +1,10 @@
+lick:L_3.2886_0
+lick:L_3.3283_0
+lick:L_3.437_0
+lick:L_3.5867_0
+lick:L_4.068_0
+Sound:catch_trial_99_6.8501_0
+lick:L_7.1404_0
+lick:L_7.2409_0
+lick:R_7.5247_0
+lick:L_7.6775_0

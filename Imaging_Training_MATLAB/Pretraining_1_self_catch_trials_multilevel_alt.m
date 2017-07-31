@@ -16,7 +16,7 @@ params = struct(...
     'numSteps',3, ...
     'sampleRate',192000, ...   %audio sample rate in Hz
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
-    'rewDur',0.06,...         %solenoid opening duration in seconds
+    'rewDur',0.02,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
     'ISI_short_MEAN',5,...        %inter stimulus interval
     'ISI_STD',2,...
@@ -40,7 +40,7 @@ base = [folder 'Data' filesep];
 fTime = datestr(datetime('now','TimeZone','local'),'yyyymmdd-HHMMSS');
 subj = input('Type subject name: ','s');
 
-fName = ['Pretaining1_self_catch_trials_multilevel' subj '_' fTime '_data.txt'];
+fName = ['Pretaining1_self_catch_trials_multilevel_alt' subj '_' fTime '_data.txt'];
 file_loc = strcat(base,fName);
 fileID = fopen(file_loc,'at+');
 %save(strcat(file_loc,'struct'), params)
@@ -124,14 +124,23 @@ click =  cat(2,zeros(1,500),ones(1,clickL),- ones(1,clickL),zeros(1,500))/2;
 
 trl_idx = 1;
 
+%standard
+stim_order = cat(1,[0,6]',Shuffle([0,6,7,8,8.5,9,9.5,10,0,6,7,8,8.5,9,9.5,10])');%biggie
 
-stim_order = Shuffle([0,2,4,6,8,10,12,14,99,0,2,4,6,8,10,12,14,99])';
+%easy one
+%stim_order = cat(1,[0,0,5]',Shuffle([0,4,4.5,5,5.5,6,6.5,0,4,4.5,5,6,6.5])');%biggie
 
-%trl_order = Shuffle([0,6,8,8.5,9,9.5,10,11,12,99,0,6,8,8.5,9,9.5,10,11,12,99,])';
+
 
 for i=1:50
-    stim_order = cat(1,trl_order,Shuffle([0,2,4,6,8,10,12,14,99,0,2,4,6,8,10,12,14,99])');
-    %trl_order = cat(1,trl_order,Shuffle([0,6,8,8.5,9,9.5,10,11,12,99,0,6,8,8.5,9,9.5,10,11,12,99])');
+    %standard
+    stim_order = cat(1,stim_order,Shuffle([0,6,7,8,8.5,9,9.5,10,0,6,7,8,8.5,9,9.5,10])');    %%biggie and earlv
+    
+    
+    %easy one
+    %stim_order = cat(1,stim_order,Shuffle([0,4,4.5,5,5.5,6,6.5,0,4,4.5,5,6,6.5,])');    %%biggie and earlv
+
+
 end
 
 
