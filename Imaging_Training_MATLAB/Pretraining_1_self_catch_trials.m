@@ -16,9 +16,9 @@ params = struct(...
     'numSteps',3, ...
     'sampleRate',192000, ...   %audio sample rate in Hz
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
-    'rewDur',0.02,...         %solenoid opening duration in seconds
+    'rewDur',0.08,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
-    'ISI_short_MEAN',5,...        %inter stimulus interval
+    'ISI_short_MEAN',5,...        %inter stimulus intercval
     'ISI_STD',2,...
     'ISI_long_MEAN',8,...        %inter stimulus interval
     'maxDur',2700, ...          %maximum time of experiment in seconds
@@ -89,7 +89,7 @@ for frq = frqs
     sndMat{i} = gensin(frq,params.sndDur,params.sampleRate,params.edgeWin);
     i = i+1;
 end
-
+5
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
