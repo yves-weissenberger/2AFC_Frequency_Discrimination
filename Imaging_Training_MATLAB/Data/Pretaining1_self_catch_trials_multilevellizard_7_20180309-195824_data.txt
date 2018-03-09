@@ -1,0 +1,10 @@
+Sound:click_8_7.0808_0
+Sound:click_0_14.624_32
+Sound:catch_trial_99_23.3624_280
+Sound:click_8_31.2616_505
+Sound:click_4_40.6603_772
+Sound:click_6_47.7438_973
+Sound:click_11_57.9397_991
+Sound:click_9_63.5695_991
+Sound:click_12_70.1304_991
+Sound:click_9_74.7827_991

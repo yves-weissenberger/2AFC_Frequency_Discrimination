@@ -1,0 +1,17 @@
+lick:L_1.1947_0
+lick:L_1.3594_0
+lick:L_1.5261_0
+lick:L_1.6741_0
+lick:L_1.8341_0
+lick:L_2.0211_0
+lick:L_2.1691_0
+lick:L_2.3541_0
+lick:L_2.5121_0
+lick:L_8.1625_0
+lick:L_8.2995_0
+lick:L_8.4775_0
+lick:L_9.7106_0
+lick:L_9.8636_0
+lick:L_10.0272_0
+lick:L_10.2427_0
+Sound:click_10_12.8281_0
