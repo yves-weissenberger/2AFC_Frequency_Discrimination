@@ -13,20 +13,24 @@ params = struct(...
     'numOct', 1.5, ...           %range of sounds in Octaves
     'minfreq',8000, ...        %min sound frequency in Hz
     'maxfreq',8000*(2^1.5), ...        %max sound frequency in Hz
-    'numSteps',3, ...
+    'numSteps',2, ...
     'sampleRate',192000, ...   %audio sample rate in Hz
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
-    'rewDur',0.08,...         %solenoid opening duration in seconds
+    'rewDur',0.05,...         %solenoid opening duration in seconds
     'maxRew',300, ...          %maximum number of rewards during experiment
-    'ISI_short_MEAN',5,...        %inter stimulus interval
+    'ISI_short_MEAN',5,...        %inter stimulus interval  %CHANGE ISI
     'ISI_STD',2,...
-    'ISI_long_MEAN',8,...        %inter stimulus interval
+    'ISI_long_MEAN',8,...        %inter stimulus interval  %LEGACY PARAMETER
     'maxDur',2700, ...          %maximum time of experiment in seconds
     'sndRewIntv',0.7 ...
     );
 
+%Johannes
+global callibration_functions
+calStr = load('C:\Users\win-ajk009-admin\Documents\Behaviour_Scripts\Two_AFC\Imaging_Training_MATLAB\callibration_functions.mat');
+callibration_functions = calStr.callibration_functions;
 
-
+% load C:\Users\win-ajk009-admin\Documents\MATLAB\snd_tone_13k.mat
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%    Define File Location    %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -40,7 +44,7 @@ base = [folder 'Data' filesep];
 fTime = datestr(datetime('now','TimeZone','local'),'yyyymmdd-HHMMSS');
 subj = input('Type subject name: ','s');
 
-fName = ['Pretaining1_self_catch_trials_multilevel' subj '_' fTime '_data.txt'];
+fName = ['Pretaining1_self_catch_trials_' subj '_' fTime '_data.txt'];
 file_loc = strcat(base,fName);
 fileID = fopen(file_loc,'at+');
 %save(strcat(file_loc,'struct'), params)
@@ -80,7 +84,7 @@ global frqs sndMat
 
 f_span = logspace(log10(params.minfreq),log10(params.maxfreq),params.numSteps);
 centreFreq = f_span(2);
-frqs = [8000,8000*2^1.5];
+frqs = [8000,8000*(2^1.5)];%Johannes
 i = 1;
 sndMat = cell(1);
 
@@ -125,39 +129,10 @@ click =  cat(2,zeros(1,500),ones(1,clickL),- ones(1,clickL),zeros(1,500))/2;
 trl_idx = 1;
 
 
-
-%this is early mapping starting levels, to gauge sensitivity
-%trl_order = Shuffle([0,2,3,4,5,6,99,0,2,3,4,5,6,99])';
-trl_order = Shuffle([0,2,3,4,6,8,10,12,99,0,2,3,4,6,8,10,12,99])';
-%trl_order = Shuffle([0,4,6,8,9,10,11,99,0,4,6,8,9,10,11,99])' ;
-%trl_order = Shuffle([8,9,8,9,8,9,8,9,8,9,8,9,8,9,8,9]-2)';
-
-%trl_order = Shuffle([0,2,3,4,5,6,7,99,0,2,3,4,5,6,7,99])';
-
-%trl_order = cat(1,[0,0,6]',Shuffle([0,6,8,8.5,9,9.5,10,12,99,0,6,8,8.5,9,9.5,10,12,99,])');%diamond
-%trl_order = cat(1,[0,6]',Shuffle([0,6,7,8,8.5,9,9.5,10,10.5,11,99,0,6,7,8,8.5,9,9.5,10,10.5,11,99])');%biggie
-
-
-%easy one
-%trl_order = cat(1,[0,0,5]',Shuffle([0,4,4.5,5,5.5,6,6.5,7,9,11,99,0,4,4.5,5,6,6.5,7,9,11,99])');%biggie
+trl_order = Shuffle([2,2,2,2,1,1,1,1])';
 
 for i=1:50
-    %intial mapping
-    %trl_order = cat(1,trl_order,Shuffle([0,2,4,6,8,10,99,0,2,4,6,8,10,99])');
-    
-    %trl_order = cat(1,trl_order, Shuffle([0,2,3,4,5,6,99,0,2,3,4,5,6,99])');
-    %trl_order = cat(1,trl_order, Shuffle([0,1,1.25,1.5,1.75,2,2.25,99,0,1,1.25,1.5,1.75,2,2.25,99])');
-%     trl_order = cat(1,trl_order, Shuffle([0,4,6,8,9,10,11,99,0,4,6,8,9,10,11,99])');
-    %trl_order = cat(1,trl_order, Shuffle([0,1.5,3,4.5,6,7.5,9,99,0,1.5,3,4.5,6,7.5,9,99])');
-%     trl_order = cat(1,trl_order, Shuffle([8,9,8,9,8,9,8,9,8,9,8,9,8,9,8,9]-2)');
-    %trl_order = cat(1,trl_order, Shuffle([0,2,3,4,5,6,7,99,0,2,3,4,5,6,7,99])');
-
-    %trl_order = cat(1,trl_order,Shuffle([0,6,8,8.5,9,9.5,10,12,99,0,6,8,8.5,9,9.5,10,12,99])');
-    %trl_order = cat(1,trl_order,Shuffle([0,6,7,8,8.5,9,9.5,10,10.5,11,99,0,6,7,8,8.5,9,9.5,10,10.5,11,99])');    %%biggie and earlv
-    trl_order = cat(1,trl_order,Shuffle([0,2,3,4,6,8,10,12,99,0,2,3,4,6,8,10,12,99])');
-    %easy one
-    %trl_order = cat(1,trl_order,Shuffle([0,4,4.5,5,5.5,6,6.5,7,9,11,99,0,4,4.5,5,6,6.5,7,9,11,99])');    %%biggie and earlv
-
+    trl_order = cat(1,trl_order,Shuffle([2,2,2,2,1,1,1,1])');
 end
 while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     
@@ -197,24 +172,24 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
         trl_idx = trl_idx + 1;
         curr_ISI = abs(normrnd(params.ISI_short_MEAN,params.ISI_STD)) + 3;
         
-        if rew_side<20
+        if rew_side==1
         
             %[snd, vol, frq] = get_stim(sndIdx,frqs,centreFreq,params);
             %The click is callibrated to ~70dB
 
-            vol = rew_side;
+            %vol = randi(5,1,1);
 
-         
-            snd = click/(1.584893^vol);
-
-            fprintf(strcat('__',num2str(vol),'__'))
+%             snd = click;%click/(2^1);Johannes
+            
+            [snd, vol, frq] = get_stim_J_3_tones(2,frqs,centreFreq,params,callibration_functions,'ThreeByThree');%Johannes
+            
             %PLAY SOUND
             PsychPortAudio('FillBuffer', pahandle, snd);
             PsychPortAudio('Start', pahandle);
             sndT = toc(tStart);
 
 
-            fprintf(fileID,strcat('Sound:','click','_',num2str(vol),'_', ...
+            fprintf(fileID,strcat('Sound:','click','_',num2str(2), ...
                 num2str(sndT),'_', ...
                 num2str(frame_Nr),'\n'));
             
@@ -229,7 +204,7 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
             
             sndT = toc(tStart);
             fprintf(strcat('__',num2str(sndT)));
-            fprintf(fileID,strcat('Sound:','catch_trial','_',num2str(99),'_', ...
+            fprintf(fileID,strcat('Sound:','catch_trial','_',num2str(2), ...
                 num2str(toc(tStart)),'_', ...
                 num2str(frame_Nr),'\n'));
             

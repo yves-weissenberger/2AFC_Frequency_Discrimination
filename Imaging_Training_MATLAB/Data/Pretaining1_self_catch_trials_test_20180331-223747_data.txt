@@ -1,0 +1,16 @@
+Sound:click_29.9683_0
+Sound:catch_trial_217.2569_0
+Sound:click_225.2101_0
+Sound:click_232.9962_0
+Sound:click_237.5094_0
+Sound:catch_trial_241.8432_0
+Sound:catch_trial_251.8625_0
+Sound:catch_trial_258.9944_0
+Sound:click_265.2524_0
+Sound:click_274.3497_0
+Sound:click_284.2301_0
+Sound:catch_trial_295.1861_0
+Sound:catch_trial_2102.9174_0
+Sound:catch_trial_2108.2692_0
+Sound:catch_trial_2118.564_0
+Sound:click_2129.3597_0

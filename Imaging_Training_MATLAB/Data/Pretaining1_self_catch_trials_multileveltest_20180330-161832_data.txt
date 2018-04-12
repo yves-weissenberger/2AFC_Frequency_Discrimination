@@ -1,0 +1,11 @@
+Sound:click_6_6.1166_0
+Sound:click_7_17.6457_0
+Sound:click_7_24.5654_0
+Sound:click_7_31.4326_0
+Sound:click_6_40.7159_0
+Sound:click_7_47.3402_0
+Sound:click_6_56.5715_0
+Sound:click_6_64.7998_0
+Sound:click_6_70.841_0
+Sound:click_6_78.5643_0
+Sound:click_7_87.3586_0

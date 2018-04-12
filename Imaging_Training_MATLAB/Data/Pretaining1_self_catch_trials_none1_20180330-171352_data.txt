@@ -1,0 +1,6 @@
+Sound:click_28.2953_0
+Sound:catch_trial_215.8773_156
+Sound:catch_trial_225.5401_430
+Sound:catch_trial_234.1824_676
+Sound:click_244.6098_972
+Sound:click_252.8679_1207
