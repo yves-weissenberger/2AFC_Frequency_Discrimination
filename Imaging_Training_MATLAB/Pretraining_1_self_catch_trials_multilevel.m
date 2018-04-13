@@ -128,7 +128,7 @@ trl_idx = 1;
 
 %this is early mapping starting levels, to gauge sensitivity
 %trl_order = Shuffle([0,2,3,4,5,6,99,0,2,3,4,5,6,99])';
-trl_order = Shuffle([0,2,3,4,6,8,10,12,99,0,2,3,4,6,8,10,12,99])';
+trl_order = Shuffle([0,2,4,6,8,9,10,12,99,0,2,4,6,8,9,10,12,99])';
 %trl_order = Shuffle([0,4,6,8,9,10,11,99,0,4,6,8,9,10,11,99])' ;
 %trl_order = Shuffle([8,9,8,9,8,9,8,9,8,9,8,9,8,9,8,9]-2)';
 
@@ -154,7 +154,7 @@ for i=1:50
 
     %trl_order = cat(1,trl_order,Shuffle([0,6,8,8.5,9,9.5,10,12,99,0,6,8,8.5,9,9.5,10,12,99])');
     %trl_order = cat(1,trl_order,Shuffle([0,6,7,8,8.5,9,9.5,10,10.5,11,99,0,6,7,8,8.5,9,9.5,10,10.5,11,99])');    %%biggie and earlv
-    trl_order = cat(1,trl_order,Shuffle([0,2,3,4,6,8,10,12,99,0,2,3,4,6,8,10,12,99])');
+    trl_order = cat(1,trl_order,Shuffle([0,2,4,6,8,9,10,12,99,0,2,4,6,8,9,10,12,99])');
     %easy one
     %trl_order = cat(1,trl_order,Shuffle([0,4,4.5,5,5.5,6,6.5,7,9,11,99,0,4,4.5,5,6,6.5,7,9,11,99])');    %%biggie and earlv
 
