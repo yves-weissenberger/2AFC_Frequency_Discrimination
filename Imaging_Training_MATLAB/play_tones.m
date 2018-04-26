@@ -48,7 +48,7 @@ while 1
     
     x = input('input sound frequency:');
     frq = double(x)*1000;
-    [~,sndIdx] = min(abs(frqs-frq));
+   % [~,sndIdx] = min(abs(frqs-frq));
     %gainF =  sqrt(10^((volm - levels_stim_calibration(sndIdx))/10));
     %exponent = gainF;
 
@@ -75,7 +75,7 @@ for ii=frqs2
     snd = gensin(frq,params.sndDur,params.sampleRate,params.edgeWin)*exponent;
     PsychPortAudio('FillBuffer', pahandle, snd);
     PsychPortAudio('Start', pahandle);
-    pause(params.sndDur*2);
+    pause(params.sndDur*3);
 end
 sprintf('done')
 

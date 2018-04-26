@@ -22,10 +22,11 @@ params = struct(...
     'ISI_STD',2,...
     'ISI_long_MEAN',8,...        %inter stimulus interval
     'maxDur',2700, ...          %maximum time of experiment in seconds
-    'sndRewIntv',0.7 ...
+    'sndRewIntv',0.7, ...
+    'lvls',[4,8] ...
     );
 
-
+%lvls = [4,8];  %these levels were too low next time try [2,7]
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%    Define File Location    %%%%%%%%%%%%%%%%%%%%%%%%
@@ -40,7 +41,7 @@ base = [folder 'Data' filesep];
 fTime = datestr(datetime('now','TimeZone','local'),'yyyymmdd-HHMMSS');
 subj = input('Type subject name: ','s');
 
-fName = ['Pretaining1_self_catch_trials_multilevel' subj '_' fTime '_data.txt'];
+fName = ['Pretaining1_self_catch_trials_blocks' subj '_' fTime '_data.txt'];
 file_loc = strcat(base,fName);
 fileID = fopen(file_loc,'at+');
 %save(strcat(file_loc,'struct'), params)
@@ -128,11 +129,10 @@ trl_idx = 1;
 
 %this is early mapping starting levels, to gauge sensitivity
 %trl_order = Shuffle([0,2,3,4,5,6,99,0,2,3,4,5,6,99])';
-trl_order = Shuffle([0,4,6,7,8,9,10,12,99,0,4,6,7,8,9,10,12,99])';
 %trl_order = Shuffle([0,4,6,8,9,10,11,99,0,4,6,8,9,10,11,99])' ;
 %trl_order = Shuffle([8,9,8,9,8,9,8,9,8,9,8,9,8,9,8,9]-2)';
 
-%trl_order = Shuffle([0,2,3,4,5,6,7,99,0,2,3,4,5,6,7,99])';
+trl_order = [1,1]';
 
 %trl_order = cat(1,[0,0,6]',Shuffle([0,6,8,8.5,9,9.5,10,12,99,0,6,8,8.5,9,9.5,10,12,99,])');%diamond
 %trl_order = cat(1,[0,6]',Shuffle([0,6,7,8,8.5,9,9.5,10,10.5,11,99,0,6,7,8,8.5,9,9.5,10,10.5,11,99])');%biggie
@@ -154,11 +154,18 @@ for i=1:50
 
     %trl_order = cat(1,trl_order,Shuffle([0,6,8,8.5,9,9.5,10,12,99,0,6,8,8.5,9,9.5,10,12,99])');
     %trl_order = cat(1,trl_order,Shuffle([0,6,7,8,8.5,9,9.5,10,10.5,11,99,0,6,7,8,8.5,9,9.5,10,10.5,11,99])');    %%biggie and earlv
-    trl_order = cat(1,trl_order,Shuffle([0,4,6,7,8,9,10,12,99,0,4,6,7,8,9,10,12,99])');
+    if rem(i,2)==0
+        trl_order = cat(1,trl_order,(ones(50,1)*params.lvls(1)));
+    else
+        trl_order = cat(1,trl_order,(ones(50,1)*params.lvls(2)));
+    end
     %easy one
     %trl_order = cat(1,trl_order,Shuffle([0,4,4.5,5,5.5,6,6.5,7,9,11,99,0,4,4.5,5,6,6.5,7,9,11,99])');    %%biggie and earlv
 
 end
+
+%% 
+
 while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     
     
