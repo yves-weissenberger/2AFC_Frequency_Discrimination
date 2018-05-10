@@ -1,0 +1,17 @@
+Sound:click_27.579_0
+Sound:click_215.7376_141
+Sound:click_224.3935_381
+Sound:catch_trial_233.9314_645
+Sound:catch_trial_242.9914_896
+Sound:click_250.3775_1101
+Sound:catch_trial_257.825_1308
+Sound:catch_trial_265.4162_1518
+Sound:catch_trial_271.9855_1700
+Sound:click_279.1435_1898
+Sound:click_289.1759_2176
+Sound:catch_trial_298.4884_2434
+freeRew:3_104.1914_2592
+freeRew:3_105.2874_2623
+freeRew:3_106.5925_2659
+Sound:catch_trial_2111.1019_2700
+Sound:catch_trial_2117.4451_2700

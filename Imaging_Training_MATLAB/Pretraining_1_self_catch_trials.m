@@ -176,7 +176,7 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
 
             %vol = randi(5,1,1);
 
-            snd = click;%click/(2^1);
+            snd = click;%;2^2);
             %PLAY SOUND
             PsychPortAudio('FillBuffer', pahandle, snd);
             PsychPortAudio('Start', pahandle);
