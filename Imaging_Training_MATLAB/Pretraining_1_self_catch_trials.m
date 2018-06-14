@@ -256,6 +256,7 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     end
 end
 
+outputSingleScan(s,[0,0]) %close solenoids
 
 PsychPortAudio('Close');
 

@@ -17,11 +17,11 @@ params = struct(...
     'sampleRate',192000, ...   %audio sample rate in Hz
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
     'rewDur',0.08,...         %solenoid opening duration in seconds
-    'maxRew',300, ...          %maximum number of rewards during experiment
+    'maxRew',3000, ...          %maximum number of rewards during experiment
     'ISI_short_MEAN',5,...        %inter stimulus interval
     'ISI_STD',2,...
     'ISI_long_MEAN',8,...        %inter stimulus interval
-    'maxDur',2700, ...          %maximum time of experiment in seconds
+    'maxDur',270000, ...          %maximum time of experiment in seconds
     'sndRewIntv',0.7, ...
     'lvls',[4,8] ...
     );
@@ -141,7 +141,7 @@ trl_order = [1,1]';
 %easy one
 %trl_order = cat(1,[0,0,5]',Shuffle([0,4,4.5,5,5.5,6,6.5,7,9,11,99,0,4,4.5,5,6,6.5,7,9,11,99])');%biggie
 
-for i=1:50
+for i=1:100
     %intial mapping
     %trl_order = cat(1,trl_order,Shuffle([0,2,4,6,8,10,99,0,2,4,6,8,10,99])');
     
@@ -294,6 +294,7 @@ while toc(tStart)<params.maxDur && rewCnt<params.maxRew
     end
 end
 
+outputSingleScan(s,[0,0]) %close solenoids
 
 PsychPortAudio('Close');
 
