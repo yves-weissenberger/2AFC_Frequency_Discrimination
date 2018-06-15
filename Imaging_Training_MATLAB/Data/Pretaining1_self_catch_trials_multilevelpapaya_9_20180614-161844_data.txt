@@ -1,0 +1,17 @@
+Sound:click_7_9.9333_0
+lick:L_10.212_0
+rew:RL_10.2181_0
+lick:L_10.3984_0
+lick:L_10.5734_0
+lick:L_10.7034_0
+Sound:click_4_16.8262_24
+lick:L_17.1434_33
+rew:RL_17.1474_33
+lick:L_17.2714_36
+lick:L_17.4194_40
+lick:L_17.5568_43
+lick:L_23.3615_196
+lick:L_23.5245_200
+Sound:catch_trial_99_26.5231_279
+lick:L_29.0386_346
+lick:L_29.2596_351

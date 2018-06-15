@@ -1,0 +1,6 @@
+lick:L_4.3724_0
+lick:L_4.55_0
+Sound:click_8.5_5.4539_0
+lick:L_8.3867_32
+lick:L_11.3507_110
+Sound:catch_trial_99_12.3875_137
