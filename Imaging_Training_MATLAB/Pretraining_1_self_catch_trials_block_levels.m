@@ -16,7 +16,7 @@ params = struct(...
     'numSteps',3, ...
     'sampleRate',192000, ...   %audio sample rate in Hz
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
-    'rewDur',0.08,...         %solenoid opening duration in seconds
+    'rewDur',0.05,...         %solenoid opening duration in seconds
     'maxRew',3000, ...          %maximum number of rewards during experiment
     'ISI_short_MEAN',5,...        %inter stimulus interval
     'ISI_STD',2,...
@@ -141,6 +141,12 @@ trl_order = [1,1]';
 %easy one
 %trl_order = cat(1,[0,0,5]',Shuffle([0,4,4.5,5,5.5,6,6.5,7,9,11,99,0,4,4.5,5,6,6.5,7,9,11,99])');%biggie
 
+if rand()>.5
+    stwth = 0;
+else
+    stwth = 1;
+end
+
 for i=1:100
     %intial mapping
     %trl_order = cat(1,trl_order,Shuffle([0,2,4,6,8,10,99,0,2,4,6,8,10,99])');
@@ -154,10 +160,18 @@ for i=1:100
 
     %trl_order = cat(1,trl_order,Shuffle([0,6,8,8.5,9,9.5,10,12,99,0,6,8,8.5,9,9.5,10,12,99])');
     %trl_order = cat(1,trl_order,Shuffle([0,6,7,8,8.5,9,9.5,10,10.5,11,99,0,6,7,8,8.5,9,9.5,10,10.5,11,99])');    %%biggie and earlv
-    if rem(i,2)==0
-        trl_order = cat(1,trl_order,(ones(50,1)*params.lvls(1)));
+    if rem(i,2)==stwth
+        temp = [];
+        for kk=1:5
+            temp = cat(1,temp,Shuffle(cat(1,ones(8,1)*params.lvls(1),[11,99]')));
+        end
+        trl_order = cat(1,trl_order,temp);
     else
-        trl_order = cat(1,trl_order,(ones(50,1)*params.lvls(2)));
+        temp = [];
+        for kk=1:5
+            temp = cat(1,temp,Shuffle(cat(1,ones(8,1)*params.lvls(2),[11,99]')));
+        end
+        trl_order = cat(1,trl_order,temp);
     end
     %easy one
     %trl_order = cat(1,trl_order,Shuffle([0,4,4.5,5,5.5,6,6.5,7,9,11,99,0,4,4.5,5,6,6.5,7,9,11,99])');    %%biggie and earlv
