@@ -16,14 +16,14 @@ params = struct(...
     'numSteps',3, ...
     'sampleRate',192000, ...   %audio sample rate in Hz
     'edgeWin',0.01, ...        %size of cosine smoothing edge window in seconds
-    'rewDur',0.05,...         %solenoid opening duration in seconds
+    'rewDur',0.03,...         %solenoid opening duration in seconds
     'maxRew',3000, ...          %maximum number of rewards during experiment
     'ISI_short_MEAN',5,...        %inter stimulus interval
     'ISI_STD',2,...
     'ISI_long_MEAN',8,...        %inter stimulus interval
     'maxDur',270000, ...          %maximum time of experiment in seconds
     'sndRewIntv',0.5, ...
-    'lvls',[4,9] ...
+    'lvls',[4,9.5] ...
     );
 
 %lvls = [4,8];  %these levels were too low next time try [2,7]
@@ -162,13 +162,13 @@ for i=1:100
     %trl_order = cat(1,trl_order,Shuffle([0,6,7,8,8.5,9,9.5,10,10.5,11,99,0,6,7,8,8.5,9,9.5,10,10.5,11,99])');    %%biggie and earlv
     if rem(i,2)==stwth
         temp = [];
-        for kk=1:3
+        for kk=1:5
             temp = cat(1,temp,Shuffle(cat(1,ones(randi([6,9],1),1)*params.lvls(1),[11,11]')));
         end
         trl_order = cat(1,trl_order,temp);
     else
         temp = [];
-        for kk=1:3
+        for kk=1:5
             temp = cat(1,temp,Shuffle(cat(1,ones(randi([6,9],1),1)*params.lvls(2),[11,11]')));
         end
         trl_order = cat(1,trl_order,temp);
